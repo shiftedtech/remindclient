@@ -16,6 +16,11 @@
 
 * { box-sizing: border-box; }
 
+/* Must beat the display rules below: .layout sets display:grid, which would
+   otherwise override the [hidden] attribute and keep the app on screen after
+   sign-out. */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   background: var(--bg);

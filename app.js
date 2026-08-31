@@ -530,9 +530,15 @@ async function render(session) {
   $('whoBar').hidden = !signedIn;
 
   if (!signedIn) {
+    // Wipe the previous coach's data out of the DOM, not just out of view.
     profile = null;
     students = [];
-    $('studentList').innerHTML = '';
+    overrides = new Map();
+    ['studentList', 'calGrid', 'todayList'].forEach((id) => { $(id).innerHTML = ''; });
+    $('monthSummary').textContent = '';
+    $('search').value = '';
+    query = '';
+    document.querySelectorAll('dialog[open]').forEach((d) => d.close());
     return;
   }
   await Promise.all([loadProfile(), loadStudents()]);
