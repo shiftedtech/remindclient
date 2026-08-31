@@ -1,1 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RemindClient</title>
+<meta name="description" content="Payment + lesson reminders for freelance tutors, coaches and instructors.">
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
+<header class="topbar">
+  <div class="brand">RemindClient</div>
+  <div id="whoBar" class="who" hidden>
+    <span id="trialChip" class="chip"></span>
+    <button id="settingsBtn" class="ghost" type="button">Settings</button>
+    <button id="signOutBtn" class="ghost" type="button">Sign out</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ---------------- AUTH ---------------- -->
+  <section id="authView" class="card auth" hidden>
+    <div class="tabs">
+      <button id="tabSignIn"  class="tab is-active" type="button">Sign in</button>
+      <button id="tabSignUp"  class="tab" type="button">Create account</button>
+    </div>
+
+    <form id="authForm" novalidate>
+      <label class="field signup-only" hidden>
+        <span>Your name</span>
+        <input id="fullName" type="text" autocomplete="name" placeholder="Fahmy Mahamud">
+      </label>
+
+      <label class="field">
+        <span>Email</span>
+        <input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input id="password" type="password" autocomplete="current-password" required minlength="6" placeholder="At least 6 characters">
+      </label>
+
+      <label class="field signup-only" hidden>
+        <span>Promo code <em>(optional)</em></span>
+        <input id="promoCode" type="text" autocomplete="off" placeholder="TEACH3" style="text-transform:uppercase">
+      </label>
+
+      <button id="authSubmit" class="primary block" type="submit">Sign in</button>
+      <p class="hint signup-only" hidden>Free trial: 14 days, or 90 days with a valid promo code.</p>
+    </form>
+
+    <div class="divider"><span>or</span></div>
+    <button id="googleBtn" class="block google" type="button">Continue with Google</button>
+  </section>
+
+  <!-- ---------------- APP ---------------- -->
+  <section id="appView" hidden>
+    <div class="list-head">
+      <h2>Students <span id="studentCount" class="count"></span></h2>
+      <button id="addBtn" class="primary" type="button">+ Add student</button>
+    </div>
+
+    <p id="emptyState" class="empty" hidden>
+      No students yet. Add your first one — name and fee are enough to start.
+    </p>
+
+    <ul id="studentList" class="students"></ul>
+  </section>
+
+</main>
+
+<!-- ---------------- student add/edit ---------------- -->
+<dialog id="studentDialog">
+  <form id="studentForm" method="dialog">
+    <h3 id="studentDialogTitle">Add student</h3>
+    <input type="hidden" id="studentId">
+
+    <label class="field">
+      <span>Student name *</span>
+      <input id="sName" type="text" required placeholder="Aisyah">
+    </label>
+
+    <label class="field">
+      <span>Payer name</span>
+      <input id="sPayerName" type="text" placeholder="Mrs Tan (mum)">
+    </label>
+
+    <label class="field">
+      <span>Payer contact</span>
+      <input id="sPayerContact" type="tel" inputmode="tel" placeholder="+65 9123 4567">
+    </label>
+
+    <div class="row">
+      <label class="field">
+        <span>Fee (S$)</span>
+        <input id="sFee" type="number" inputmode="decimal" min="0" step="0.01" placeholder="120">
+      </label>
+      <label class="field">
+        <span>Due day</span>
+        <input id="sDueDay" type="number" inputmode="numeric" min="1" max="31" placeholder="15">
+      </label>
+    </div>
+
+    <label class="field">
+      <span>Lesson slot</span>
+      <input id="sLessonSlot" type="text" placeholder="Tue 4:00pm">
+    </label>
+
+    <div class="dialog-actions">
+      <button type="button" class="ghost" data-close>Cancel</button>
+      <button type="submit" class="primary">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ---------------- coach profile ---------------- -->
+<dialog id="settingsDialog">
+  <form id="settingsForm" method="dialog">
+    <h3>Your profile</h3>
+
+    <label class="field">
+      <span>Your name</span>
+      <input id="pFullName" type="text" placeholder="Fahmy Mahamud">
+    </label>
+
+    <label class="field">
+      <span>PayNow number / UEN</span>
+      <input id="pPayNow" type="text" placeholder="+65 9123 4567">
+    </label>
+
+    <label class="field">
+      <span>Default reminder message</span>
+      <textarea id="pTemplate" rows="4" placeholder="Hi {payer}, gentle reminder that {student}'s fee of S${amount} for {month} is due on the {due_day}. PayNow: {paynow}. Thank you!"></textarea>
+      <em class="hint">Used in stage 3 (WhatsApp reminders). Saved now so setup is one-time.</em>
+    </label>
+
+    <p id="planLine" class="hint"></p>
+
+    <div class="dialog-actions">
+      <button type="button" class="ghost" data-close>Cancel</button>
+      <button type="submit" class="primary">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" hidden></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

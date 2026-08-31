@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+node_modules/
+.env
+.env.*
+
+# The live survey lives in its own repo (shiftedtech/remindclientsurvey).
+# Excluded so guide.pdf is not republished under the app URL.
+Survey/
