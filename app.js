@@ -21,9 +21,9 @@ const DOW_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const DOW_LONG = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
 
 const DEFAULT_TEMPLATE =
-  "Hi {payer}! Hope you're doing well. Just a friendly reminder that {student}'s fee for "
-  + "{month} is {amount}, due on the {due_day}. You can PayNow to {paynow} whenever it's "
-  + "convenient — and if you've already sent it, please ignore this. Thank you! 🙏";
+  "Hi {payer}! Hope {student} is doing well. Just a heads up before our next lesson — "
+  + "{month}'s fee is {amount}, due on the {due_day}. PayNow to {paynow} whenever you're "
+  + "free. No rush at all, and thank you for your support! 🙏";
 
 /* ------------------------------------------------------------------ utils */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
