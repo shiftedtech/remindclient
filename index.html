@@ -205,7 +205,10 @@
     <label class="field">
       <span>Default reminder message</span>
       <textarea id="pTemplate" rows="4"></textarea>
-      <em class="hint">Tokens: {student} {payer} {amount} {month} {due_day} {paynow}</em>
+      <em class="hint">
+        Tokens: {student} {payer} {amount} {month} {due_day} {paynow}
+        · <button type="button" class="link" id="resetTemplate">Reset to default</button>
+      </em>
     </label>
 
     <p id="planLine" class="hint"></p>

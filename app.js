@@ -178,9 +178,14 @@ function renderPlan() {
 $('settingsBtn').onclick = () => {
   $('pFullName').value = profile?.full_name ?? '';
   $('pPayNow').value = profile?.paynow_number ?? '';
-  $('pTemplate').value = profile?.template_text ?? '';
+  $('pTemplate').value = profile?.template_text?.trim() || DEFAULT_TEMPLATE;
   renderPlan();
   $('settingsDialog').showModal();
+};
+
+$('resetTemplate').onclick = () => {
+  $('pTemplate').value = DEFAULT_TEMPLATE;
+  $('pTemplate').focus();
 };
 
 $('settingsForm').addEventListener('submit', async (e) => {
