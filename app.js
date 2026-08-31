@@ -12,7 +12,10 @@ let students = [];
 let mode = 'signin';        // 'signin' | 'signup'
 let calCursor = startOfMonth(new Date());
 let query = '';
-let pickerDow = null;       // weekday currently open in the lesson picker
+let overrides = new Map();  // "studentId|YYYY-MM-DD" -> 'add' | 'cancel'
+let pickerMode = 'weekly';  // 'weekly' = recurring schedule, 'date' = one-off
+let pickerDow = null;       // weekday open in the picker
+let pickerDate = null;      // { key: 'YYYY-MM-DD', y, m, d, dow } when mode = 'date'
 
 const DOW_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const DOW_LONG = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
@@ -38,6 +41,17 @@ const ordinal = (d) => {
 function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
 function sameMonth(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth(); }
 const days = (s) => Array.isArray(s?.lesson_days) ? s.lesson_days : [];
+const ymd = (y, m, d) => y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+const ovKey = (id, key) => id + '|' + key;
+
+// Weekly schedule, adjusted by any one-off change for that exact date.
+function hasLessonOn(s, key, dow) {
+  const o = overrides.get(ovKey(s.id, key));
+  if (o === 'cancel') return false;
+  if (o === 'add') return true;
+  return days(s).includes(dow);
+}
+function lessonsOn(key, dow) { return students.filter((s) => hasLessonOn(s, key, dow)); }
 const dayLabels = (s) => days(s).slice().sort().map((d) => DOW_SHORT[d]).join(', ');
 
 let toastTimer;
@@ -192,7 +206,20 @@ async function loadStudents() {
     .order('name', { ascending: true });
   if (error) return fail(error, 'load your students');
   students = data ?? [];
+  await loadOverrides();
   renderAll();
+}
+
+async function loadOverrides() {
+  overrides = new Map();
+  const from = ymd(calCursor.getFullYear(), calCursor.getMonth(), 1) ;
+  const { data, error } = await sb
+    .from('lesson_overrides')
+    .select('student_id, on_date, action')
+    .gte('on_date', from);
+  // Missing table just means 0003 hasn't been run — the weekly schedule still works.
+  if (error) return console.warn('lesson_overrides unavailable', error.message);
+  (data ?? []).forEach((o) => overrides.set(ovKey(o.student_id, o.on_date), o.action));
 }
 
 // The list is only ever narrowed by the search box — never by the calendar.
@@ -241,23 +268,29 @@ function renderCalendar() {
   for (let i = 0; i < lead; i++) html += '<span></span>';
   for (let d = 1; d <= daysInMonth; d++) {
     const dow = new Date(y, m, d).getDay();
-    const isToday = sameMonth(calCursor, today) && d === today.getDate();
-    const cls = [isToday ? 'today' : '', dueDays.has(d) ? 'due' : ''].filter(Boolean).join(' ');
-    const count = perDow[dow] || 0;
-    const title = count ? count + (count === 1 ? ' lesson' : ' lessons') + ' on ' + DOW_LONG[dow] : '';
-    html += '<button type="button" class="' + cls + '" data-dow="' + dow + '" title="' + title + '">'
+    const key = ymd(y, m, d);
+    const count = lessonsOn(key, dow).length;
+    const edited = students.some((s) => overrides.has(ovKey(s.id, key)));
+    const cls = [
+      sameMonth(calCursor, today) && d === today.getDate() ? 'today' : '',
+      dueDays.has(d) ? 'due' : '',
+      edited ? 'adj' : '',
+    ].filter(Boolean).join(' ');
+    const title = (count ? count + (count === 1 ? ' lesson' : ' lessons') : 'No lessons')
+      + (edited ? ' (changed for this date)' : '');
+    html += '<button type="button" class="' + cls + '" data-date="' + d + '" title="' + title + '">'
       + d + (count ? '<i class="dot"></i>' : '') + '</button>';
   }
   $('calGrid').innerHTML = html;
 
-  // Highlight weekday headers that have lessons.
   $('calDow').querySelectorAll('button').forEach((b) => {
     b.classList.toggle('has', !!perDow[Number(b.dataset.dow)]);
   });
 }
 
 function renderSidebar() {
-  const todays = students.filter((s) => days(s).includes(new Date().getDay()));
+  const now = new Date();
+  const todays = lessonsOn(ymd(now.getFullYear(), now.getMonth(), now.getDate()), now.getDay());
   $('todayList').innerHTML = todays.length
     ? todays.map((s) => '<li><span class="truncate">' + esc(s.name) + '</span>'
         + '<span class="t">' + (s.fee_amount ? money(s.fee_amount) : '') + '</span></li>').join('')
@@ -275,56 +308,113 @@ function renderAll() {
   renderSidebar();
 }
 
-$('calPrev').onclick = () => { calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() - 1, 1); renderCalendar(); };
-$('calNext').onclick = () => { calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() + 1, 1); renderCalendar(); };
+async function goMonth(delta) {
+  calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() + delta, 1);
+  await loadOverrides();
+  renderCalendar();
+}
+$('calPrev').onclick = () => goMonth(-1);
+$('calNext').onclick = () => goMonth(1);
 $('search').addEventListener('input', (e) => { query = e.target.value; renderStudents(); });
 
-/* --------------------------------------------- who has lessons on <day> */
-function openLessonPicker(dow) {
-  pickerDow = dow;
-  $('lessonDialogTitle').textContent = 'Lessons on ' + DOW_LONG[dow];
+/* ------------------------------------- who has lessons: weekly vs one-off */
+function renderPicker() {
   if (!students.length) {
     $('lessonPicker').innerHTML = '<li class="none">Add a student first.</li>';
-  } else {
-    $('lessonPicker').innerHTML = students.map((s) =>
-      '<li><label><input type="checkbox" data-id="' + s.id + '"'
-      + (days(s).includes(dow) ? ' checked' : '') + '>'
-      + '<span class="truncate">' + esc(s.name) + '</span></label></li>').join('');
+    return;
   }
+  $('lessonPicker').innerHTML = students.map((s) => {
+    const on = pickerMode === 'weekly'
+      ? days(s).includes(pickerDow)
+      : hasLessonOn(s, pickerDate.key, pickerDate.dow);
+    const o = pickerMode === 'date' ? overrides.get(ovKey(s.id, pickerDate.key)) : null;
+    const tag = o === 'add' ? '<em class="tag">one-off</em>'
+      : o === 'cancel' ? '<em class="tag">cancelled</em>' : '';
+    return '<li><label><input type="checkbox" data-id="' + s.id + '"' + (on ? ' checked' : '') + '>'
+      + '<span class="truncate">' + esc(s.name) + '</span>' + tag + '</label></li>';
+  }).join('');
+}
+
+// Weekly schedule — set once from the M T W T F S S header, repeats every week.
+function openWeeklyPicker(dow) {
+  pickerMode = 'weekly';
+  pickerDow = dow;
+  const day = DOW_LONG[dow].replace(/s$/, '');
+  $('lessonDialogTitle').textContent = 'Every ' + day;
+  $('lessonHint').textContent = 'Tick who has a lesson every ' + day + '. This repeats weekly — set it once.';
+  renderPicker();
+  $('lessonDialog').showModal();
+}
+
+// One-off change — this date only. The weekly schedule is left alone.
+function openDatePicker(y, m, d) {
+  pickerMode = 'date';
+  pickerDate = { key: ymd(y, m, d), y, m, d, dow: new Date(y, m, d).getDay() };
+  $('lessonDialogTitle').textContent = new Date(y, m, d)
+    .toLocaleDateString('en-SG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  $('lessonHint').textContent = 'One-off change for this date only — your weekly schedule stays as it is.';
+  renderPicker();
   $('lessonDialog').showModal();
 }
 
 $('calDow').addEventListener('click', (e) => {
   const dow = e.target.closest('button')?.dataset.dow;
-  if (dow !== undefined) openLessonPicker(Number(dow));
+  if (dow !== undefined) openWeeklyPicker(Number(dow));
 });
 
 $('calGrid').addEventListener('click', (e) => {
-  const dow = e.target.closest('button')?.dataset.dow;
-  if (dow !== undefined) openLessonPicker(Number(dow));
+  const d = e.target.closest('button')?.dataset.date;
+  if (d !== undefined) openDatePicker(calCursor.getFullYear(), calCursor.getMonth(), Number(d));
 });
 
 $('lessonPicker').addEventListener('change', async (e) => {
   const box = e.target;
   if (!box.dataset.id) return;
-
   const s = students.find((x) => x.id === box.dataset.id);
   if (!s) return;
 
-  const next = box.checked
-    ? Array.from(new Set([...days(s), pickerDow])).sort()
-    : days(s).filter((d) => d !== pickerDow);
+  const ok = pickerMode === 'weekly'
+    ? await saveWeekly(s, box.checked)
+    : await saveOneOff(s, box.checked);
 
-  const { error } = await sb.from('students').update({ lesson_days: next }).eq('id', s.id);
-  if (error) {
-    box.checked = !box.checked;             // put the tick back where it was
-    return fail(error, 'save that lesson day');
-  }
-  s.lesson_days = next;
+  if (!ok) { box.checked = !box.checked; return; }   // put the tick back
+  renderPicker();
   renderStudents();
   renderCalendar();
   renderSidebar();
 });
+
+async function saveWeekly(s, checked) {
+  const next = checked
+    ? Array.from(new Set([...days(s), pickerDow])).sort()
+    : days(s).filter((d) => d !== pickerDow);
+
+  const { error } = await sb.from('students').update({ lesson_days: next }).eq('id', s.id);
+  if (error) { fail(error, 'save the weekly schedule'); return false; }
+  s.lesson_days = next;
+  return true;
+}
+
+async function saveOneOff(s, checked) {
+  const { key, dow } = pickerDate;
+  const usual = days(s).includes(dow);
+
+  // Back to normal for this date? Drop the exception rather than store a no-op.
+  if (checked === usual) {
+    const { error } = await sb.from('lesson_overrides')
+      .delete().eq('student_id', s.id).eq('on_date', key);
+    if (error) { fail(error, 'undo that change'); return false; }
+    overrides.delete(ovKey(s.id, key));
+    return true;
+  }
+
+  const action = checked ? 'add' : 'cancel';
+  const { error } = await sb.from('lesson_overrides')
+    .upsert({ student_id: s.id, on_date: key, action }, { onConflict: 'student_id,on_date' });
+  if (error) { fail(error, 'save that change'); return false; }
+  overrides.set(ovKey(s.id, key), action);
+  return true;
+}
 
 $('lessonDone').onclick = () => $('lessonDialog').close();
 
