@@ -122,12 +122,6 @@ textarea { resize: vertical; }
 .toolbar input { flex: 1; min-width: 0; }
 .count { color: var(--muted); font-size: 14px; white-space: nowrap; }
 
-.filter-bar {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af;
-  padding: 8px 12px; border-radius: 10px; font-size: 14px; margin-bottom: 10px;
-}
-
 /* ---------- student table ---------- */
 .table {
   background: var(--card); border: 1px solid var(--line);
@@ -174,6 +168,19 @@ textarea { resize: vertical; }
   .rows > li > :nth-child(5) { grid-area: slot; }
 }
 
+/* ---------- lesson picker + WhatsApp button ---------- */
+.wa { border-color: #25d366; color: #128c3f; font-weight: 600; }
+.picker {
+  list-style: none; margin: 0 0 14px; padding: 0;
+  max-height: 46vh; overflow-y: auto;
+  border: 1px solid var(--line); border-radius: 10px;
+}
+.picker li + li { border-top: 1px solid var(--line); }
+.picker label { display: flex; align-items: center; gap: 10px; padding: 9px 12px; cursor: pointer; }
+.picker label:hover { background: var(--hover); }
+.picker input { width: auto; flex: none; accent-color: var(--accent); }
+.picker .none { padding: 14px; color: var(--muted); }
+
 /* ---------- sidebar ---------- */
 .side { display: grid; gap: 12px; }
 .side-block {
@@ -184,7 +191,13 @@ textarea { resize: vertical; }
 
 .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .cal-dow, .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.cal-dow { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 4px; }
+.cal-dow { margin-bottom: 4px; }
+.cal-dow button {
+  font-size: 11px; color: var(--muted); background: none; border: 0;
+  padding: 4px 0; border-radius: 6px; font-weight: 600;
+}
+.cal-dow button:hover { background: var(--hover); color: var(--ink); }
+.cal-dow button.has { color: var(--accent); }
 .cal button, .cal span {
   position: relative; aspect-ratio: 1; border: 0; background: none; color: inherit;
   font-size: 13px; display: flex; align-items: center; justify-content: center;
@@ -192,12 +205,11 @@ textarea { resize: vertical; }
 }
 .cal button:hover { background: var(--hover); }
 .cal .today { outline: 2px solid var(--accent); outline-offset: -2px; font-weight: 700; }
-.cal .is-sel { background: var(--accent); color: #fff; }
+.cal .due { box-shadow: inset 0 0 0 1.5px var(--warn); }
 .cal .dot {
   position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
   width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
 }
-.cal .is-sel .dot { background: #fff; }
 .cal-legend { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
 
 .mini { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; }
@@ -239,6 +251,5 @@ dialog h3 { margin: 0 0 16px; font-size: 18px; }
   .tab.is-active { background: #e2e8f0; color: #0b1220; border-color: #e2e8f0; }
   .google { background: #fff; color: #1f1f1f; border-color: #dadce0; }
   .thead { background: #0d1424; }
-  .filter-bar { background: #12233f; border-color: #1e3a5f; color: #bfdbfe; }
   .toast { background: #1e293b; }
 }

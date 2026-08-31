@@ -1,4 +1,4 @@
-// RemindClient — Stage 1: auth + student CRUD.
+// RemindClient — Stage 1: auth + student CRUD (+ weekly lesson days, WhatsApp reminder).
 // Only dependency: supabase-js v2 from a pinned CDN build. No build step.
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
@@ -11,8 +11,14 @@ let profile = null;
 let students = [];
 let mode = 'signin';        // 'signin' | 'signup'
 let calCursor = startOfMonth(new Date());
-let selectedDay = null;     // day-of-month filter from the calendar
 let query = '';
+let pickerDow = null;       // weekday currently open in the lesson picker
+
+const DOW_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DOW_LONG = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
+
+const DEFAULT_TEMPLATE =
+  "Hi {payer}, gentle reminder that {student}'s fee of {amount} for {month} is due on the {due_day}. PayNow: {paynow}. Thank you!";
 
 /* ------------------------------------------------------------------ utils */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
@@ -31,6 +37,8 @@ const ordinal = (d) => {
 
 function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
 function sameMonth(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth(); }
+const days = (s) => Array.isArray(s?.lesson_days) ? s.lesson_days : [];
+const dayLabels = (s) => days(s).slice().sort().map((d) => DOW_SHORT[d]).join(', ');
 
 let toastTimer;
 function toast(msg, kind = '') {
@@ -92,7 +100,6 @@ $('authForm').addEventListener('submit', async (e) => {
         },
       });
       if (error) throw error;
-      // Email confirmation ON => no session yet.
       if (!data.session) toast('Check your email to confirm your account.', 'ok');
     }
   } catch (err) {
@@ -118,8 +125,6 @@ async function loadProfile() {
   if (error) return fail(error, 'load your profile');
 
   profile = data;
-  // Safety net: if the signup trigger didn't run (e.g. a user created before
-  // the migration), create the row now with the default 14-day trial.
   if (!profile) {
     const { data: created, error: insErr } = await sb
       .from('profiles')
@@ -136,11 +141,11 @@ function planStatus() {
   const now = Date.now();
   const paid = profile?.paid_until ? new Date(profile.paid_until).getTime() : 0;
   const trial = profile?.trial_ends_at ? new Date(profile.trial_ends_at).getTime() : 0;
-  const days = (t) => Math.ceil((t - now) / 86400000);
+  const left = (t) => Math.ceil((t - now) / 86400000);
 
-  if (paid > now) return { text: 'Paid · ' + days(paid) + 'd left', kind: '' };
+  if (paid > now) return { text: 'Paid · ' + left(paid) + 'd left', kind: '' };
   if (trial > now) {
-    const d = days(trial);
+    const d = left(trial);
     return { text: 'Trial · ' + d + 'd left', kind: d <= 3 ? 'warn' : '' };
   }
   return { text: 'Trial ended', kind: 'bad' };
@@ -183,21 +188,19 @@ $('settingsForm').addEventListener('submit', async (e) => {
 async function loadStudents() {
   const { data, error } = await sb
     .from('students')
-    .select('id, name, payer_name, payer_contact, fee_amount, due_day, lesson_slot')
+    .select('*')   // '*' so the app still loads if 0002 has not been run yet
     .order('name', { ascending: true });
   if (error) return fail(error, 'load your students');
   students = data ?? [];
   renderAll();
 }
 
+// The list is only ever narrowed by the search box — never by the calendar.
 function visibleStudents() {
   const q = query.trim().toLowerCase();
-  return students.filter((s) => {
-    if (selectedDay && Number(s.due_day) !== selectedDay) return false;
-    if (!q) return true;
-    return [s.name, s.payer_name, s.payer_contact, s.lesson_slot]
-      .some((v) => String(v ?? '').toLowerCase().includes(q));
-  });
+  if (!q) return students;
+  return students.filter((s) => [s.name, s.payer_name, s.payer_contact]
+    .some((v) => String(v ?? '').toLowerCase().includes(q)));
 }
 
 function renderStudents() {
@@ -215,26 +218,12 @@ function renderStudents() {
     + '<span class="sub truncate">' + esc(s.payer_name || s.payer_contact || '—') + '</span>'
     + '<span class="num">' + (s.fee_amount ? money(s.fee_amount) : '—') + '</span>'
     + '<span class="num sub">' + (s.due_day ? ordinal(s.due_day) : '—') + '</span>'
-    + '<span class="sub truncate">' + esc(s.lesson_slot || '—') + '</span>'
+    + '<span class="sub truncate">' + (dayLabels(s) || '—') + '</span>'
     + '</li>').join('');
 }
 
 /* ------------------------------------------------------------- calendar */
-const DOW = [
-  ['sun', 'sunday'], ['mon', 'monday'], ['tue', 'tuesday'], ['wed', 'wednesday'],
-  ['thu', 'thursday'], ['fri', 'friday'], ['sat', 'saturday'],
-];
-
-// lesson_slot is free text, so we look for a weekday word in it. No match => not listed.
-function lessonsToday() {
-  const today = new Date().getDay();
-  const [short, long] = DOW[today];
-  return students.filter((s) => {
-    const t = String(s.lesson_slot ?? '').toLowerCase();
-    return t.includes(long) || new RegExp('\\b' + short).test(t);
-  });
-}
-
+// A tool for seeing which students come on which day. It never filters the list.
 function renderCalendar() {
   const y = calCursor.getFullYear();
   const m = calCursor.getMonth();
@@ -245,24 +234,34 @@ function renderCalendar() {
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   const lead = (new Date(y, m, 1).getDay() + 6) % 7;   // Monday-first grid
   const dueDays = new Set(students.map((s) => Number(s.due_day)).filter(Boolean));
+  const perDow = {};
+  students.forEach((s) => days(s).forEach((d) => { perDow[d] = (perDow[d] || 0) + 1; }));
 
   let html = '';
   for (let i = 0; i < lead; i++) html += '<span></span>';
   for (let d = 1; d <= daysInMonth; d++) {
+    const dow = new Date(y, m, d).getDay();
     const isToday = sameMonth(calCursor, today) && d === today.getDate();
-    const cls = [isToday ? 'today' : '', selectedDay === d ? 'is-sel' : ''].filter(Boolean).join(' ');
-    html += '<button type="button" class="' + cls + '" data-day="' + d + '">' + d
-      + (dueDays.has(d) ? '<i class="dot"></i>' : '') + '</button>';
+    const cls = [isToday ? 'today' : '', dueDays.has(d) ? 'due' : ''].filter(Boolean).join(' ');
+    const count = perDow[dow] || 0;
+    const title = count ? count + (count === 1 ? ' lesson' : ' lessons') + ' on ' + DOW_LONG[dow] : '';
+    html += '<button type="button" class="' + cls + '" data-dow="' + dow + '" title="' + title + '">'
+      + d + (count ? '<i class="dot"></i>' : '') + '</button>';
   }
   $('calGrid').innerHTML = html;
+
+  // Highlight weekday headers that have lessons.
+  $('calDow').querySelectorAll('button').forEach((b) => {
+    b.classList.toggle('has', !!perDow[Number(b.dataset.dow)]);
+  });
 }
 
 function renderSidebar() {
-  const today = lessonsToday();
-  $('todayList').innerHTML = today.length
-    ? today.map((s) => '<li><span class="truncate">' + esc(s.name) + '</span>'
-        + '<span class="t">' + esc(s.lesson_slot ?? '') + '</span></li>').join('')
-    : '<li class="none">No lessons found for today.</li>';
+  const todays = students.filter((s) => days(s).includes(new Date().getDay()));
+  $('todayList').innerHTML = todays.length
+    ? todays.map((s) => '<li><span class="truncate">' + esc(s.name) + '</span>'
+        + '<span class="t">' + (s.fee_amount ? money(s.fee_amount) : '') + '</span></li>').join('')
+    : '<li class="none">No lessons today.</li>';
 
   const total = students.reduce((sum, s) => sum + Number(s.fee_amount || 0), 0);
   $('monthSummary').textContent = students.length
@@ -270,31 +269,64 @@ function renderSidebar() {
     : 'No students yet.';
 }
 
-function renderFilterBar() {
-  const on = selectedDay !== null;
-  $('filterBar').hidden = !on;
-  if (on) $('filterLabel').textContent = 'Showing students due on the ' + ordinal(selectedDay);
-}
-
 function renderAll() {
   renderStudents();
   renderCalendar();
   renderSidebar();
-  renderFilterBar();
 }
-
-$('calGrid').addEventListener('click', (e) => {
-  const day = e.target.closest('button')?.dataset.day;
-  if (!day) return;
-  selectedDay = selectedDay === Number(day) ? null : Number(day);
-  renderAll();
-});
 
 $('calPrev').onclick = () => { calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() - 1, 1); renderCalendar(); };
 $('calNext').onclick = () => { calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() + 1, 1); renderCalendar(); };
-$('clearFilter').onclick = () => { selectedDay = null; renderAll(); };
-
 $('search').addEventListener('input', (e) => { query = e.target.value; renderStudents(); });
+
+/* --------------------------------------------- who has lessons on <day> */
+function openLessonPicker(dow) {
+  pickerDow = dow;
+  $('lessonDialogTitle').textContent = 'Lessons on ' + DOW_LONG[dow];
+  if (!students.length) {
+    $('lessonPicker').innerHTML = '<li class="none">Add a student first.</li>';
+  } else {
+    $('lessonPicker').innerHTML = students.map((s) =>
+      '<li><label><input type="checkbox" data-id="' + s.id + '"'
+      + (days(s).includes(dow) ? ' checked' : '') + '>'
+      + '<span class="truncate">' + esc(s.name) + '</span></label></li>').join('');
+  }
+  $('lessonDialog').showModal();
+}
+
+$('calDow').addEventListener('click', (e) => {
+  const dow = e.target.closest('button')?.dataset.dow;
+  if (dow !== undefined) openLessonPicker(Number(dow));
+});
+
+$('calGrid').addEventListener('click', (e) => {
+  const dow = e.target.closest('button')?.dataset.dow;
+  if (dow !== undefined) openLessonPicker(Number(dow));
+});
+
+$('lessonPicker').addEventListener('change', async (e) => {
+  const box = e.target;
+  if (!box.dataset.id) return;
+
+  const s = students.find((x) => x.id === box.dataset.id);
+  if (!s) return;
+
+  const next = box.checked
+    ? Array.from(new Set([...days(s), pickerDow])).sort()
+    : days(s).filter((d) => d !== pickerDow);
+
+  const { error } = await sb.from('students').update({ lesson_days: next }).eq('id', s.id);
+  if (error) {
+    box.checked = !box.checked;             // put the tick back where it was
+    return fail(error, 'save that lesson day');
+  }
+  s.lesson_days = next;
+  renderStudents();
+  renderCalendar();
+  renderSidebar();
+});
+
+$('lessonDone').onclick = () => $('lessonDialog').close();
 
 /* ------------------------------------------------------- add / edit / del */
 function openStudent(s) {
@@ -305,8 +337,8 @@ function openStudent(s) {
   $('sPayerContact').value = s?.payer_contact ?? '';
   $('sFee').value = s?.fee_amount ?? '';
   $('sDueDay').value = s?.due_day ?? '';
-  $('sLessonSlot').value = s?.lesson_slot ?? '';
   $('deleteBtn').hidden = !s;
+  $('remindBtn').hidden = !s;
   $('studentDialog').showModal();
 }
 
@@ -316,6 +348,40 @@ $('studentList').addEventListener('click', (e) => {
   const id = e.target.closest('li')?.dataset.id;
   if (id) openStudent(students.find((s) => s.id === id));
 });
+
+/* ------------------------------------------------------ WhatsApp reminder */
+// Digits only. A bare 8-digit local number is assumed Singapore (+65).
+function waNumber(raw) {
+  const d = String(raw ?? '').replace(/\D/g, '');
+  if (!d) return '';
+  return d.length === 8 ? '65' + d : d;
+}
+
+function reminderText(s) {
+  const month = new Date().toLocaleDateString('en-SG', { month: 'long', year: 'numeric' });
+  const map = {
+    '{student}': s.name ?? '',
+    '{payer}': s.payer_name || 'there',
+    '{amount}': s.fee_amount ? money(s.fee_amount) : '',
+    '{month}': month,
+    '{due_day}': s.due_day ? ordinal(s.due_day) : '',
+    '{paynow}': profile?.paynow_number ?? '',
+  };
+  const tpl = profile?.template_text?.trim() || DEFAULT_TEMPLATE;
+  return tpl.replace(/\{(student|payer|amount|month|due_day|paynow)\}/g, (t) => map[t] ?? t);
+}
+
+$('remindBtn').onclick = () => {
+  const s = students.find((x) => x.id === $('studentId').value);
+  if (!s) return;
+
+  const num = waNumber(s.payer_contact);
+  if (!num) return toast("Add the payer's contact number first.", 'bad');
+  if (!profile?.paynow_number) toast('Tip: add your PayNow number in Settings.', '');
+
+  // Opened from the tutor's own phone — free, and inside WhatsApp's terms.
+  window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(reminderText(s)), '_blank', 'noopener');
+};
 
 $('deleteBtn').onclick = async () => {
   const id = $('studentId').value;
@@ -344,7 +410,6 @@ $('studentForm').addEventListener('submit', async (e) => {
     payer_contact: $('sPayerContact').value.trim() || null,
     fee_amount: $('sFee').value ? Number($('sFee').value) : 0,
     due_day: dueDay,
-    lesson_slot: $('sLessonSlot').value.trim() || null,
   };
 
   const id = $('studentId').value;

@@ -82,18 +82,13 @@
         <button id="addBtn" class="primary" type="button">+ Add student</button>
       </div>
 
-      <div id="filterBar" class="filter-bar" hidden>
-        <span id="filterLabel"></span>
-        <button id="clearFilter" class="link" type="button">Clear</button>
-      </div>
-
       <div class="table">
         <div class="thead">
           <span>Name</span>
           <span>Payer</span>
           <span class="num">Fee</span>
           <span class="num">Due</span>
-          <span>Lesson</span>
+          <span>Lessons</span>
         </div>
         <ul id="studentList" class="rows"></ul>
       </div>
@@ -110,9 +105,17 @@
           <strong id="calMonth"></strong>
           <button id="calNext" class="icon" type="button" aria-label="Next month">›</button>
         </div>
-        <div class="cal-dow"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+        <div class="cal-dow" id="calDow">
+          <button type="button" data-dow="1">M</button>
+          <button type="button" data-dow="2">T</button>
+          <button type="button" data-dow="3">W</button>
+          <button type="button" data-dow="4">T</button>
+          <button type="button" data-dow="5">F</button>
+          <button type="button" data-dow="6">S</button>
+          <button type="button" data-dow="0">S</button>
+        </div>
         <div id="calGrid" class="cal"></div>
-        <p class="cal-legend">Dots mark payment due dates.</p>
+        <p class="cal-legend">Tap a weekday to set who has lessons. Dots mark lesson days; rings mark payment due dates.</p>
       </div>
 
       <div class="side-block">
@@ -163,19 +166,25 @@
       </label>
     </div>
 
-    <label class="field">
-      <span>Lesson slot</span>
-      <input id="sLessonSlot" type="text">
-      <em class="hint">Include the weekday so it shows under today's lessons.</em>
-    </label>
-
     <div class="dialog-actions">
+      <button type="button" id="remindBtn" class="ghost wa" hidden>Remind on WhatsApp</button>
       <button type="button" id="deleteBtn" class="link danger" hidden>Delete</button>
       <span class="spacer"></span>
       <button type="button" class="ghost" data-close>Cancel</button>
       <button type="submit" class="primary">Save</button>
     </div>
   </form>
+</dialog>
+
+<!-- ---------------- who has lessons on <weekday> ---------------- -->
+<dialog id="lessonDialog">
+  <h3 id="lessonDialogTitle">Lessons</h3>
+  <p class="hint" id="lessonHint">Tick the students who have a lesson on this day every week.</p>
+  <ul id="lessonPicker" class="picker"></ul>
+  <div class="dialog-actions">
+    <span class="spacer"></span>
+    <button type="button" class="primary" id="lessonDone">Done</button>
+  </div>
 </dialog>
 
 <!-- ---------------- coach profile ---------------- -->
