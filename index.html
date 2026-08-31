@@ -27,51 +27,105 @@
   <!-- ---------------- AUTH ---------------- -->
   <section id="authView" class="card auth" hidden>
     <div class="tabs">
-      <button id="tabSignIn"  class="tab is-active" type="button">Sign in</button>
-      <button id="tabSignUp"  class="tab" type="button">Create account</button>
+      <button id="tabSignIn" class="tab is-active" type="button">Sign in</button>
+      <button id="tabSignUp" class="tab" type="button">Create account</button>
     </div>
 
     <form id="authForm" novalidate>
       <label class="field signup-only" hidden>
         <span>Your name</span>
-        <input id="fullName" type="text" autocomplete="name" placeholder="Fahmy Mahamud">
+        <input id="fullName" type="text" autocomplete="name">
       </label>
 
       <label class="field">
         <span>Email</span>
-        <input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        <input id="email" type="email" autocomplete="email" required>
       </label>
 
       <label class="field">
         <span>Password</span>
-        <input id="password" type="password" autocomplete="current-password" required minlength="6" placeholder="At least 6 characters">
+        <input id="password" type="password" autocomplete="current-password" required minlength="6">
       </label>
 
-      <label class="field signup-only" hidden>
-        <span>Promo code <em>(optional)</em></span>
-        <input id="promoCode" type="text" autocomplete="off" placeholder="TEACH3" style="text-transform:uppercase">
-      </label>
+      <div class="signup-only" hidden>
+        <button id="promoToggle" class="link" type="button">Have a promo code?</button>
+        <label class="field" id="promoField" hidden>
+          <span>Promo code</span>
+          <input id="promoCode" type="text" autocomplete="off" spellcheck="false" style="text-transform:uppercase">
+        </label>
+      </div>
 
       <button id="authSubmit" class="primary block" type="submit">Sign in</button>
-      <p class="hint signup-only" hidden>Free trial: 14 days, or 90 days with a valid promo code.</p>
+      <p class="hint signup-only" hidden>14-day free trial. No card needed.</p>
     </form>
 
     <div class="divider"><span>or</span></div>
-    <button id="googleBtn" class="block google" type="button">Continue with Google</button>
+
+    <button id="googleBtn" class="block google" type="button">
+      <svg class="g-logo" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+        <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/>
+        <path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/>
+        <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
+      </svg>
+      <span>Continue with Google</span>
+    </button>
   </section>
 
   <!-- ---------------- APP ---------------- -->
-  <section id="appView" hidden>
-    <div class="list-head">
-      <h2>Students <span id="studentCount" class="count"></span></h2>
-      <button id="addBtn" class="primary" type="button">+ Add student</button>
+  <section id="appView" class="layout" hidden>
+
+    <div class="pane">
+      <div class="toolbar">
+        <input id="search" type="search" aria-label="Search students">
+        <span id="studentCount" class="count"></span>
+        <button id="addBtn" class="primary" type="button">+ Add student</button>
+      </div>
+
+      <div id="filterBar" class="filter-bar" hidden>
+        <span id="filterLabel"></span>
+        <button id="clearFilter" class="link" type="button">Clear</button>
+      </div>
+
+      <div class="table">
+        <div class="thead">
+          <span>Name</span>
+          <span>Payer</span>
+          <span class="num">Fee</span>
+          <span class="num">Due</span>
+          <span>Lesson</span>
+        </div>
+        <ul id="studentList" class="rows"></ul>
+      </div>
+
+      <p id="emptyState" class="empty" hidden>
+        No students yet. Add your first one — name and fee are enough to start.
+      </p>
     </div>
 
-    <p id="emptyState" class="empty" hidden>
-      No students yet. Add your first one — name and fee are enough to start.
-    </p>
+    <aside class="side">
+      <div class="side-block">
+        <div class="cal-head">
+          <button id="calPrev" class="icon" type="button" aria-label="Previous month">‹</button>
+          <strong id="calMonth"></strong>
+          <button id="calNext" class="icon" type="button" aria-label="Next month">›</button>
+        </div>
+        <div class="cal-dow"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+        <div id="calGrid" class="cal"></div>
+        <p class="cal-legend">Dots mark payment due dates.</p>
+      </div>
 
-    <ul id="studentList" class="students"></ul>
+      <div class="side-block">
+        <h4>Today's lessons</h4>
+        <ul id="todayList" class="mini"></ul>
+      </div>
+
+      <div class="side-block">
+        <h4>This month</h4>
+        <p id="monthSummary" class="hint"></p>
+      </div>
+    </aside>
+
   </section>
 
 </main>
@@ -84,36 +138,40 @@
 
     <label class="field">
       <span>Student name *</span>
-      <input id="sName" type="text" required placeholder="Aisyah">
-    </label>
-
-    <label class="field">
-      <span>Payer name</span>
-      <input id="sPayerName" type="text" placeholder="Mrs Tan (mum)">
-    </label>
-
-    <label class="field">
-      <span>Payer contact</span>
-      <input id="sPayerContact" type="tel" inputmode="tel" placeholder="+65 9123 4567">
+      <input id="sName" type="text" required>
     </label>
 
     <div class="row">
       <label class="field">
-        <span>Fee (S$)</span>
-        <input id="sFee" type="number" inputmode="decimal" min="0" step="0.01" placeholder="120">
+        <span>Payer name</span>
+        <input id="sPayerName" type="text">
       </label>
       <label class="field">
-        <span>Due day</span>
-        <input id="sDueDay" type="number" inputmode="numeric" min="1" max="31" placeholder="15">
+        <span>Payer contact</span>
+        <input id="sPayerContact" type="tel" inputmode="tel">
+      </label>
+    </div>
+
+    <div class="row">
+      <label class="field">
+        <span>Fee (S$)</span>
+        <input id="sFee" type="number" inputmode="decimal" min="0" step="0.01">
+      </label>
+      <label class="field">
+        <span>Due day of month</span>
+        <input id="sDueDay" type="number" inputmode="numeric" min="1" max="31">
       </label>
     </div>
 
     <label class="field">
       <span>Lesson slot</span>
-      <input id="sLessonSlot" type="text" placeholder="Tue 4:00pm">
+      <input id="sLessonSlot" type="text">
+      <em class="hint">Include the weekday so it shows under today's lessons.</em>
     </label>
 
     <div class="dialog-actions">
+      <button type="button" id="deleteBtn" class="link danger" hidden>Delete</button>
+      <span class="spacer"></span>
       <button type="button" class="ghost" data-close>Cancel</button>
       <button type="submit" class="primary">Save</button>
     </div>
@@ -127,23 +185,24 @@
 
     <label class="field">
       <span>Your name</span>
-      <input id="pFullName" type="text" placeholder="Fahmy Mahamud">
+      <input id="pFullName" type="text">
     </label>
 
     <label class="field">
       <span>PayNow number / UEN</span>
-      <input id="pPayNow" type="text" placeholder="+65 9123 4567">
+      <input id="pPayNow" type="text">
     </label>
 
     <label class="field">
       <span>Default reminder message</span>
-      <textarea id="pTemplate" rows="4" placeholder="Hi {payer}, gentle reminder that {student}'s fee of S${amount} for {month} is due on the {due_day}. PayNow: {paynow}. Thank you!"></textarea>
-      <em class="hint">Used in stage 3 (WhatsApp reminders). Saved now so setup is one-time.</em>
+      <textarea id="pTemplate" rows="4"></textarea>
+      <em class="hint">Tokens: {student} {payer} {amount} {month} {due_day} {paynow}</em>
     </label>
 
     <p id="planLine" class="hint"></p>
 
     <div class="dialog-actions">
+      <span class="spacer"></span>
       <button type="button" class="ghost" data-close>Cancel</button>
       <button type="submit" class="primary">Save</button>
     </div>

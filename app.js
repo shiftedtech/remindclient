@@ -9,7 +9,10 @@ const $ = (id) => document.getElementById(id);
 let user = null;
 let profile = null;
 let students = [];
-let mode = 'signin';   // 'signin' | 'signup'
+let mode = 'signin';        // 'signin' | 'signup'
+let calCursor = startOfMonth(new Date());
+let selectedDay = null;     // day-of-month filter from the calendar
+let query = '';
 
 /* ------------------------------------------------------------------ utils */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
@@ -25,6 +28,9 @@ const ordinal = (d) => {
   const suffix = (rest >= 11 && rest <= 13) ? 'th' : (['th', 'st', 'nd', 'rd'][n % 10] || 'th');
   return n + suffix;
 };
+
+function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+function sameMonth(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth(); }
 
 let toastTimer;
 function toast(msg, kind = '') {
@@ -47,12 +53,19 @@ function setMode(next) {
   $('tabSignIn').classList.toggle('is-active', mode === 'signin');
   $('tabSignUp').classList.toggle('is-active', mode === 'signup');
   document.querySelectorAll('.signup-only').forEach((el) => { el.hidden = mode !== 'signup'; });
+  $('promoField').hidden = true;              // collapsed again on every tab switch
   $('authSubmit').textContent = mode === 'signin' ? 'Sign in' : 'Create account';
   $('password').autocomplete = mode === 'signin' ? 'current-password' : 'new-password';
 }
 
 $('tabSignIn').onclick = () => setMode('signin');
 $('tabSignUp').onclick = () => setMode('signup');
+
+$('promoToggle').onclick = () => {
+  const f = $('promoField');
+  f.hidden = !f.hidden;
+  if (!f.hidden) $('promoCode').focus();
+};
 
 $('authForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -97,9 +110,7 @@ $('googleBtn').onclick = async () => {
   if (error) fail(error, 'sign in with Google');
 };
 
-$('signOutBtn').onclick = async () => {
-  await sb.auth.signOut();
-};
+$('signOutBtn').onclick = async () => { await sb.auth.signOut(); };
 
 /* --------------------------------------------------------------- profile */
 async function loadProfile() {
@@ -176,33 +187,116 @@ async function loadStudents() {
     .order('name', { ascending: true });
   if (error) return fail(error, 'load your students');
   students = data ?? [];
-  renderStudents();
+  renderAll();
+}
+
+function visibleStudents() {
+  const q = query.trim().toLowerCase();
+  return students.filter((s) => {
+    if (selectedDay && Number(s.due_day) !== selectedDay) return false;
+    if (!q) return true;
+    return [s.name, s.payer_name, s.payer_contact, s.lesson_slot]
+      .some((v) => String(v ?? '').toLowerCase().includes(q));
+  });
 }
 
 function renderStudents() {
-  const list = $('studentList');
-  $('studentCount').textContent = students.length ? '(' + students.length + ')' : '';
+  const shown = visibleStudents();
+  $('studentCount').textContent = shown.length === students.length
+    ? students.length + (students.length === 1 ? ' student' : ' students')
+    : shown.length + ' of ' + students.length;
+
   $('emptyState').hidden = students.length > 0;
+  document.querySelector('.table').hidden = students.length === 0;
 
-  list.innerHTML = students.map((s) => {
-    const bits = [
-      s.fee_amount ? '<span class="money">' + money(s.fee_amount) + '</span>' : '',
-      s.due_day ? 'due ' + ordinal(s.due_day) : '',
-      s.lesson_slot ? esc(s.lesson_slot) : '',
-    ].filter(Boolean).join(' · ');
-    const payer = [s.payer_name, s.payer_contact].filter(Boolean).map(esc).join(' · ');
-
-    return '<li class="student" data-id="' + s.id + '">'
-      + '<div class="name">' + esc(s.name) + '</div>'
-      + (payer ? '<div class="meta">' + payer + '</div>' : '')
-      + (bits ? '<div class="meta">' + bits + '</div>' : '')
-      + '<div class="actions">'
-      + '<button class="link" data-edit="' + s.id + '" type="button">Edit</button>'
-      + '<button class="link danger" data-del="' + s.id + '" type="button">Delete</button>'
-      + '</div></li>';
-  }).join('');
+  $('studentList').innerHTML = shown.map((s) =>
+    '<li data-id="' + s.id + '">'
+    + '<span class="nm truncate">' + esc(s.name) + '</span>'
+    + '<span class="sub truncate">' + esc(s.payer_name || s.payer_contact || '—') + '</span>'
+    + '<span class="num">' + (s.fee_amount ? money(s.fee_amount) : '—') + '</span>'
+    + '<span class="num sub">' + (s.due_day ? ordinal(s.due_day) : '—') + '</span>'
+    + '<span class="sub truncate">' + esc(s.lesson_slot || '—') + '</span>'
+    + '</li>').join('');
 }
 
+/* ------------------------------------------------------------- calendar */
+const DOW = [
+  ['sun', 'sunday'], ['mon', 'monday'], ['tue', 'tuesday'], ['wed', 'wednesday'],
+  ['thu', 'thursday'], ['fri', 'friday'], ['sat', 'saturday'],
+];
+
+// lesson_slot is free text, so we look for a weekday word in it. No match => not listed.
+function lessonsToday() {
+  const today = new Date().getDay();
+  const [short, long] = DOW[today];
+  return students.filter((s) => {
+    const t = String(s.lesson_slot ?? '').toLowerCase();
+    return t.includes(long) || new RegExp('\\b' + short).test(t);
+  });
+}
+
+function renderCalendar() {
+  const y = calCursor.getFullYear();
+  const m = calCursor.getMonth();
+  const today = new Date();
+
+  $('calMonth').textContent = calCursor.toLocaleDateString('en-SG', { month: 'long', year: 'numeric' });
+
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const lead = (new Date(y, m, 1).getDay() + 6) % 7;   // Monday-first grid
+  const dueDays = new Set(students.map((s) => Number(s.due_day)).filter(Boolean));
+
+  let html = '';
+  for (let i = 0; i < lead; i++) html += '<span></span>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = sameMonth(calCursor, today) && d === today.getDate();
+    const cls = [isToday ? 'today' : '', selectedDay === d ? 'is-sel' : ''].filter(Boolean).join(' ');
+    html += '<button type="button" class="' + cls + '" data-day="' + d + '">' + d
+      + (dueDays.has(d) ? '<i class="dot"></i>' : '') + '</button>';
+  }
+  $('calGrid').innerHTML = html;
+}
+
+function renderSidebar() {
+  const today = lessonsToday();
+  $('todayList').innerHTML = today.length
+    ? today.map((s) => '<li><span class="truncate">' + esc(s.name) + '</span>'
+        + '<span class="t">' + esc(s.lesson_slot ?? '') + '</span></li>').join('')
+    : '<li class="none">No lessons found for today.</li>';
+
+  const total = students.reduce((sum, s) => sum + Number(s.fee_amount || 0), 0);
+  $('monthSummary').textContent = students.length
+    ? students.length + ' students · ' + money(total) + ' expected'
+    : 'No students yet.';
+}
+
+function renderFilterBar() {
+  const on = selectedDay !== null;
+  $('filterBar').hidden = !on;
+  if (on) $('filterLabel').textContent = 'Showing students due on the ' + ordinal(selectedDay);
+}
+
+function renderAll() {
+  renderStudents();
+  renderCalendar();
+  renderSidebar();
+  renderFilterBar();
+}
+
+$('calGrid').addEventListener('click', (e) => {
+  const day = e.target.closest('button')?.dataset.day;
+  if (!day) return;
+  selectedDay = selectedDay === Number(day) ? null : Number(day);
+  renderAll();
+});
+
+$('calPrev').onclick = () => { calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() - 1, 1); renderCalendar(); };
+$('calNext').onclick = () => { calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() + 1, 1); renderCalendar(); };
+$('clearFilter').onclick = () => { selectedDay = null; renderAll(); };
+
+$('search').addEventListener('input', (e) => { query = e.target.value; renderStudents(); });
+
+/* ------------------------------------------------------- add / edit / del */
 function openStudent(s) {
   $('studentDialogTitle').textContent = s ? 'Edit student' : 'Add student';
   $('studentId').value = s?.id ?? '';
@@ -212,27 +306,29 @@ function openStudent(s) {
   $('sFee').value = s?.fee_amount ?? '';
   $('sDueDay').value = s?.due_day ?? '';
   $('sLessonSlot').value = s?.lesson_slot ?? '';
+  $('deleteBtn').hidden = !s;
   $('studentDialog').showModal();
 }
 
 $('addBtn').onclick = () => openStudent(null);
 
-$('studentList').addEventListener('click', async (e) => {
-  const editId = e.target.dataset.edit;
-  const delId = e.target.dataset.del;
-
-  if (editId) return openStudent(students.find((s) => s.id === editId));
-
-  if (delId) {
-    const s = students.find((x) => x.id === delId);
-    if (!confirm('Delete ' + (s?.name ?? 'this student') + '? This cannot be undone.')) return;
-    const { error } = await sb.from('students').delete().eq('id', delId);
-    if (error) return fail(error, 'delete that student');
-    students = students.filter((x) => x.id !== delId);
-    renderStudents();
-    toast('Student deleted.');
-  }
+$('studentList').addEventListener('click', (e) => {
+  const id = e.target.closest('li')?.dataset.id;
+  if (id) openStudent(students.find((s) => s.id === id));
 });
+
+$('deleteBtn').onclick = async () => {
+  const id = $('studentId').value;
+  const s = students.find((x) => x.id === id);
+  if (!confirm('Delete ' + (s?.name ?? 'this student') + '? This cannot be undone.')) return;
+
+  const { error } = await sb.from('students').delete().eq('id', id);
+  if (error) return fail(error, 'delete that student');
+  students = students.filter((x) => x.id !== id);
+  $('studentDialog').close();
+  renderAll();
+  toast('Student deleted.');
+};
 
 $('studentForm').addEventListener('submit', async (e) => {
   e.preventDefault();
