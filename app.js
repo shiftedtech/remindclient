@@ -13,6 +13,7 @@ let mode = 'signin';        // 'signin' | 'signup'
 let calCursor = startOfMonth(new Date());
 let query = '';
 let overrides = new Map();  // "studentId|YYYY-MM-DD" -> 'add' | 'cancel'
+let payments = new Map();   // studentId -> payment row for the displayed month
 let pickerMode = 'weekly';  // 'weekly' = recurring schedule, 'date' = one-off
 let pickerDow = null;       // weekday open in the picker
 let pickerDate = null;      // { key: 'YYYY-MM-DD', y, m, d, dow } when mode = 'date'
@@ -47,6 +48,27 @@ const ymd = (y, m, d) => y + '-' + String(m + 1).padStart(2, '0') + '-' + String
 const ovKey = (id, key) => id + '|' + key;
 
 // Weekly schedule, adjusted by any one-off change for that exact date.
+const monthKey = (d) => ymd(d.getFullYear(), d.getMonth(), 1);
+const daysIn = (y, m) => new Date(y, m + 1, 0).getDate();
+
+// Paid / Overdue / Due soon / Due, for the month currently on screen.
+function statusOf(s) {
+  const row = payments.get(s.id);
+  if (row?.status === 'paid') return 'paid';
+  if (!s.due_day) return 'none';
+
+  const y = calCursor.getFullYear();
+  const m = calCursor.getMonth();
+  const due = new Date(y, m, Math.min(Number(s.due_day), daysIn(y, m)));
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+
+  if (today > due) return 'overdue';
+  if ((due - today) / 86400000 <= 7) return 'soon';
+  return 'due';
+}
+
+const STATUS_TEXT = { paid: 'Paid', overdue: 'Overdue', soon: 'Due soon', due: 'Due', none: '—' };
+
 function hasLessonOn(s, key, dow) {
   const o = overrides.get(ovKey(s.id, key));
   if (o === 'cancel') return false;
@@ -213,8 +235,32 @@ async function loadStudents() {
     .order('name', { ascending: true });
   if (error) return fail(error, 'load your students');
   students = data ?? [];
-  await loadOverrides();
+  await Promise.all([loadOverrides(), loadPayments()]);
   renderAll();
+}
+
+async function loadPayments() {
+  payments = new Map();
+  const key = monthKey(calCursor);
+
+  // Create this month's rows on first sight, so the dashboard is never empty.
+  // Browsing a past month shows history as it was; it never back-fills.
+  const now = new Date();
+  if (key >= monthKey(now) && students.length) {
+    const rows = students.map((s) => ({
+      student_id: s.id, month: key, amount: Number(s.fee_amount || 0), status: 'due',
+    }));
+    const { error } = await sb.from('payments')
+      .upsert(rows, { onConflict: 'student_id,month', ignoreDuplicates: true });
+    if (error) console.warn('could not create this month rows', error.message);
+  }
+
+  const { data, error } = await sb
+    .from('payments')
+    .select('id, student_id, month, amount, status, paid_at')
+    .eq('month', key);
+  if (error) return console.warn('payments unavailable', error.message);
+  (data ?? []).forEach((r) => payments.set(r.student_id, r));
 }
 
 async function loadOverrides() {
@@ -256,6 +302,46 @@ function renderStudents() {
     + '</li>').join('');
 }
 
+function statusCell(s) {
+  const st = statusOf(s);
+  if (st === 'none') return '<span class="st-wrap sub">&mdash;</span>';
+  const label = st === 'paid' ? 'Paid' : 'Mark paid';
+  const title = st === 'paid' ? 'Paid \u2014 tap to undo' : STATUS_TEXT[st] + ' \u2014 tap to mark paid';
+  return '<span class="st-wrap"><button type="button" class="st ' + st
+    + '" data-pay="' + s.id + '" title="' + title + '">' + label + '</button></span>';
+}
+
+// One tap, applied immediately. The write happens behind it; if it fails the
+// chip goes back to where it was.
+async function togglePaid(id) {
+  const s = students.find((x) => x.id === id);
+  if (!s) return;
+
+  const key = monthKey(calCursor);
+  const row = payments.get(id);
+  const nowPaid = row?.status !== 'paid';
+  const patch = { status: nowPaid ? 'paid' : 'due', paid_at: nowPaid ? new Date().toISOString() : null };
+
+  const before = row ? { ...row } : null;
+  payments.set(id, { ...(row ?? { student_id: id, month: key, amount: Number(s.fee_amount || 0) }), ...patch });
+  renderStudents();
+  renderSidebar();
+  renderCalendar();
+
+  const { error } = row
+    ? await sb.from('payments').update(patch).eq('id', row.id)
+    : await sb.from('payments').insert({
+        student_id: id, month: key, amount: Number(s.fee_amount || 0), ...patch,
+      });
+
+  if (error) {
+    if (before) payments.set(id, before); else payments.delete(id);
+    renderStudents(); renderSidebar(); renderCalendar();
+    return fail(error, 'save that payment');
+  }
+  if (!row) await loadPayments();   // pick up the id of the row we just made
+}
+
 /* ------------------------------------------------------------- calendar */
 // A tool for seeing which students come on which day. It never filters the list.
 function renderCalendar() {
@@ -267,7 +353,6 @@ function renderCalendar() {
 
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   const lead = (new Date(y, m, 1).getDay() + 6) % 7;   // Monday-first grid
-  const dueDays = new Set(students.map((s) => Number(s.due_day)).filter(Boolean));
   const perDow = {};
   students.forEach((s) => days(s).forEach((d) => { perDow[d] = (perDow[d] || 0) + 1; }));
 
@@ -278,13 +363,22 @@ function renderCalendar() {
     const key = ymd(y, m, d);
     const count = lessonsOn(key, dow).length;
     const edited = students.some((s) => overrides.has(ovKey(s.id, key)));
+    const dueHere = students.filter((s) => Number(s.due_day) === d);
+    const sts = dueHere.map(statusOf);
+    const ring = !dueHere.length ? ''
+      : sts.includes('overdue') ? 'r-over'
+      : sts.includes('soon') ? 'r-soon'
+      : sts.every((x) => x === 'paid') ? 'r-paid' : 'r-due';
     const cls = [
       sameMonth(calCursor, today) && d === today.getDate() ? 'today' : '',
-      dueDays.has(d) ? 'due' : '',
+      ring,
       edited ? 'adj' : '',
     ].filter(Boolean).join(' ');
-    const title = (count ? count + (count === 1 ? ' lesson' : ' lessons') : 'No lessons')
-      + (edited ? ' (changed for this date)' : '');
+    const title = [
+      count ? count + (count === 1 ? ' lesson' : ' lessons') : 'No lessons',
+      dueHere.length ? dueHere.length + ' payment due' : '',
+      edited ? 'changed for this date' : '',
+    ].filter(Boolean).join(' \u00b7 ');
     html += '<button type="button" class="' + cls + '" data-date="' + d + '" title="' + title + '">'
       + d + (count ? '<i class="dot"></i>' : '') + '</button>';
   }
@@ -303,10 +397,33 @@ function renderSidebar() {
         + '<span class="t">' + (s.fee_amount ? money(s.fee_amount) : '') + '</span></li>').join('')
     : '<li class="none">No lessons today.</li>';
 
-  const total = students.reduce((sum, s) => sum + Number(s.fee_amount || 0), 0);
-  $('monthSummary').textContent = students.length
-    ? students.length + ' students · ' + money(total) + ' expected'
-    : 'No students yet.';
+  if (!students.length) {
+    $('monthTitle').textContent = 'This month';
+    $('monthSummary').textContent = 'No students yet.';
+    $('collectBar').hidden = true;
+    return;
+  }
+
+  let expected = 0, collected = 0;
+  const tally = { paid: 0, overdue: 0, soon: 0, due: 0, none: 0 };
+  students.forEach((s) => {
+    const row = payments.get(s.id);
+    const amt = Number(row?.amount ?? s.fee_amount ?? 0);
+    expected += amt;
+    const st = statusOf(s);
+    tally[st] += 1;
+    if (st === 'paid') collected += amt;
+  });
+
+  $('monthTitle').textContent = calCursor.toLocaleDateString('en-SG', { month: 'long', year: 'numeric' });
+  $('monthSummary').textContent = 'Collected ' + money(collected) + ' / ' + money(expected);
+
+  $('collectBar').hidden = false;
+  $('collectFill').style.width = (expected ? Math.round((collected / expected) * 100) : 0) + '%';
+  $('monthTally').innerHTML =
+    '<span class="tl paid">' + tally.paid + ' paid</span>'
+    + '<span class="tl overdue">' + tally.overdue + ' overdue</span>'
+    + '<span class="tl due">' + (tally.due + tally.soon) + ' due</span>';
 }
 
 function renderAll() {
@@ -317,8 +434,8 @@ function renderAll() {
 
 async function goMonth(delta) {
   calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() + delta, 1);
-  await loadOverrides();
-  renderCalendar();
+  await Promise.all([loadOverrides(), loadPayments()]);
+  renderAll();
 }
 $('calPrev').onclick = () => goMonth(-1);
 $('calNext').onclick = () => goMonth(1);
@@ -442,6 +559,9 @@ function openStudent(s) {
 $('addBtn').onclick = () => openStudent(null);
 
 $('studentList').addEventListener('click', (e) => {
+  const payId = e.target.closest('[data-pay]')?.dataset.pay;
+  if (payId) { e.stopPropagation(); return togglePaid(payId); }
+
   const id = e.target.closest('li')?.dataset.id;
   if (id) openStudent(students.find((s) => s.id === id));
 });
@@ -541,6 +661,7 @@ async function render(session) {
     profile = null;
     students = [];
     overrides = new Map();
+    payments = new Map();
     ['studentList', 'calGrid', 'todayList'].forEach((id) => { $(id).innerHTML = ''; });
     $('monthSummary').textContent = '';
     $('search').value = '';

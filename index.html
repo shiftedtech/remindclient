@@ -89,6 +89,7 @@
           <span class="num">Fee</span>
           <span class="num">Due</span>
           <span>Lessons</span>
+          <span class="st-head">Status</span>
         </div>
         <ul id="studentList" class="rows"></ul>
       </div>
@@ -124,8 +125,10 @@
       </div>
 
       <div class="side-block">
-        <h4>This month</h4>
-        <p id="monthSummary" class="hint"></p>
+        <h4 id="monthTitle">This month</h4>
+        <p id="monthSummary" class="total"></p>
+        <div id="collectBar" class="bar" hidden><i id="collectFill"></i></div>
+        <div id="monthTally" class="tally"></div>
       </div>
     </aside>
 
