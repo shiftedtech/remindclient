@@ -55,7 +55,7 @@ const daysIn = (y, m) => new Date(y, m + 1, 0).getDate();
 function statusOf(s) {
   const row = payments.get(s.id);
   if (row?.status === 'paid') return 'paid';
-  if (!s.due_day) return 'none';
+  if (!s.due_day) return 'due';          // no due day set — still payable, just never overdue
 
   const y = calCursor.getFullYear();
   const m = calCursor.getMonth();
@@ -294,7 +294,8 @@ function renderStudents() {
 
   $('studentList').innerHTML = shown.map((s) =>
     '<li data-id="' + s.id + '">'
-    + '<span class="nm truncate">' + esc(s.name) + '</span>'
+    + '<span class="nm">' + statusCell(s)
+    + '<span class="truncate">' + esc(s.name) + '</span></span>'
     + '<span class="sub truncate">' + esc(s.payer_name || s.payer_contact || '—') + '</span>'
     + '<span class="num">' + (s.fee_amount ? money(s.fee_amount) : '—') + '</span>'
     + '<span class="num sub">' + (s.due_day ? ordinal(s.due_day) : '—') + '</span>'
@@ -304,11 +305,11 @@ function renderStudents() {
 
 function statusCell(s) {
   const st = statusOf(s);
-  if (st === 'none') return '<span class="st-wrap sub">&mdash;</span>';
-  const label = st === 'paid' ? 'Paid' : 'Mark paid';
-  const title = st === 'paid' ? 'Paid \u2014 tap to undo' : STATUS_TEXT[st] + ' \u2014 tap to mark paid';
-  return '<span class="st-wrap"><button type="button" class="st ' + st
-    + '" data-pay="' + s.id + '" title="' + title + '">' + label + '</button></span>';
+  const title = st === 'paid'
+    ? 'Paid this month \u2014 tap to undo'
+    : STATUS_TEXT[st] + ' \u2014 tap to mark paid';
+  return '<button type="button" class="st ' + st + '" data-pay="' + s.id + '" title="'
+    + title + '">' + STATUS_TEXT[st] + '</button>';
 }
 
 // One tap, applied immediately. The write happens behind it; if it fails the

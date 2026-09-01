@@ -134,7 +134,7 @@ textarea { resize: vertical; }
 }
 .thead, .rows > li {
   display: grid;
-  grid-template-columns: minmax(0,1.7fr) minmax(0,1.5fr) 84px 54px minmax(0,1fr) 98px;
+  grid-template-columns: minmax(0,2.2fr) minmax(0,1.5fr) 84px 54px minmax(0,1fr);
   gap: 12px; align-items: center;
   padding: 10px 14px;
 }
@@ -147,7 +147,8 @@ textarea { resize: vertical; }
 .rows > li { border-top: 1px solid var(--line); cursor: pointer; }
 .rows > li:first-child { border-top: 0; }
 .rows > li:hover { background: var(--hover); }
-.rows .nm { font-weight: 600; }
+.rows .nm { font-weight: 600; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.rows .nm .truncate { min-width: 0; }
 .rows .sub { color: var(--muted); }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -159,11 +160,10 @@ textarea { resize: vertical; }
 }
 
 /* ---------- payment status ---------- */
-.st-head { text-align: center; }
-.st-wrap { display: flex; justify-content: center; }
 .st {
   border: 1px solid transparent; border-radius: 999px;
-  padding: 4px 10px; font-size: 12px; font-weight: 600; white-space: nowrap;
+  padding: 3px 9px; font-size: 11px; font-weight: 700; white-space: nowrap;
+  text-transform: uppercase; letter-spacing: .03em; flex: none; min-width: 62px;
 }
 .st.paid    { background: #dcfce7; color: #15803d; border-color: #86efac; }
 .st.overdue { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
@@ -189,7 +189,7 @@ textarea { resize: vertical; }
   .thead { display: none; }
   .rows > li {
     grid-template-columns: 1fr auto;
-    grid-template-areas: "nm fee" "payer due" "slot st";
+    grid-template-areas: "nm fee" "payer due" "slot slot";
     gap: 2px 12px; padding: 12px 14px;
   }
   .rows > li > :nth-child(1) { grid-area: nm; }
@@ -197,7 +197,6 @@ textarea { resize: vertical; }
   .rows > li > :nth-child(3) { grid-area: fee; }
   .rows > li > :nth-child(4) { grid-area: due; }
   .rows > li > :nth-child(5) { grid-area: slot; }
-  .rows > li > :nth-child(6) { grid-area: st; justify-content: flex-end; }
 }
 
 /* ---------- lesson picker + WhatsApp button ---------- */
