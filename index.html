@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RemindClient — AI-Powered Reminders for Service Providers</title>
+<meta name="description" content="AI-powered payment and appointment reminder app for tutors, coaches, freelancers, and landlords. Telegram & WhatsApp. Start free for 1 month.">
+<meta property="og:title" content="RemindClient by ShiftedTech">
+<meta property="og:description" content="Never chase a payment again. AI-crafted reminders for service providers.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#111111">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#FFFFFF;--off-white:#FAFAFA;--light-grey:#F5F5F5;
+  --grey-100:#F0F0F0;--grey-200:#E5E5E5;--grey-300:#D4D4D4;
+  --grey-400:#A3A3A3;--grey-500:#737373;--grey-600:#525252;
+  --black:#111111;--near-black:#1A1A1A;--dark:#262626;
+  --green:#007A3D;--green-dark:#005C2E;--green-light:#E6F5ED;--green-dim:#005C2E;
+  --red:#CE1126;--red-dark:#A50D1E;--red-light:#FCE8EB;--red-dim:#A50D1E;
+  --amber:#F59E0B;--amber-light:#FFFBEB;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--black);background:white;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--blue-500);text-decoration:none}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--grey-200);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;max-width:1280px;margin:0 auto}
+.nav-wrap{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--grey-200)}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-weight:800;font-size:1.2rem;color:var(--black);display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--green)}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links a{color:var(--grey-600);font-size:0.9rem;font-weight:500;transition:color 0.2s}
+.nav-links a:hover{color:var(--black)}
+.nav-cta{background:var(--green);color:white!important;padding:8px 20px;border-radius:6px;font-weight:600;font-size:0.9rem;transition:background 0.2s}
+.nav-cta:hover{background:var(--green-dark)}
+.nav-mobile{display:none;background:none;border:none;cursor:pointer;padding:8px}
+.nav-mobile svg{width:24px;height:24px;color:var(--black)}
+
+/* HERO */
+.hero{padding:140px 24px 100px;text-align:center;background:white}
+.hero-inner{max-width:720px;margin:0 auto}
+.hero h1{font-size:clamp(2.4rem,5vw,3.6rem);font-weight:800;line-height:1.1;letter-spacing:-0.03em;color:var(--black);margin-bottom:20px}
+.hero p{font-size:clamp(1.05rem,2vw,1.25rem);color:var(--grey-500);line-height:1.7;margin-bottom:36px;max-width:580px;margin-left:auto;margin-right:auto}
+.hero-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--green);color:white;padding:14px 28px;border-radius:8px;font-weight:600;font-size:1rem;border:none;cursor:pointer;transition:background 0.2s,transform 0.1s}
+.btn-primary:hover{background:var(--green-dark);transform:translateY(-1px)}
+.btn-secondary{background:white;color:var(--black);padding:14px 28px;border-radius:8px;font-weight:600;font-size:1rem;border:2px solid var(--black);cursor:pointer;transition:all 0.2s}
+.btn-secondary:hover{border-color:var(--black);background:var(--grey-100)}
+.hero-note{margin-top:16px;font-size:0.85rem;color:var(--grey-400)}
+
+/* SECTIONS */
+section{padding:80px 24px}
+.section-inner{max-width:1080px;margin:0 auto}
+.section-label{font-size:0.85rem;font-weight:600;color:var(--green);margin-bottom:8px}
+.section-title{font-size:clamp(1.8rem,3.5vw,2.4rem);font-weight:800;letter-spacing:-0.02em;line-height:1.2;margin-bottom:16px}
+.section-subtitle{font-size:1.05rem;color:var(--grey-500);max-width:600px;line-height:1.7;margin-bottom:48px}
+.centered{text-align:center}.centered .section-subtitle{margin-left:auto;margin-right:auto}
+
+/* PROBLEM */
+.problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.problem-card{padding:32px;border-radius:12px;border:1px solid var(--grey-200);background:white}
+.problem-card .emoji{font-size:2rem;margin-bottom:16px}
+.problem-card h3{font-size:1.15rem;font-weight:700;margin-bottom:8px;color:var(--black)}
+.problem-card p{color:var(--grey-500);font-size:0.95rem;line-height:1.65}
+.problem-bottom{text-align:center;margin-top:40px;font-size:1.1rem;color:var(--green-dim);font-weight:600;font-style:italic}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;counter-reset:step}
+.step{position:relative;padding:32px;border-radius:12px;background:var(--light-grey);border:1px solid var(--grey-200)}
+.step::before{counter-increment:step;content:counter(step);position:absolute;top:-14px;left:24px;width:28px;height:28px;border-radius:50%;background:var(--green);color:white;font-size:0.8rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.step h3{font-size:1.1rem;font-weight:700;margin-bottom:8px;margin-top:4px}
+.step p{color:var(--grey-500);font-size:0.95rem;line-height:1.65}
+
+/* FEATURES */
+.feature{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-bottom:80px}
+.feature:nth-child(even){direction:rtl}.feature:nth-child(even)>*{direction:ltr}
+.feature-text h3{font-size:1.5rem;font-weight:700;margin-bottom:12px;letter-spacing:-0.01em;color:var(--black)}
+.feature-text p{color:var(--grey-500);font-size:1rem;line-height:1.7;margin-bottom:16px}
+.feature-text ul{list-style:none;padding:0}
+.feature-text li{padding:6px 0;color:var(--grey-600);font-size:0.95rem;padding-left:24px;position:relative}
+.feature-text li::before{content:"→";position:absolute;left:0;color:var(--green);font-weight:600}
+.feature-visual{border-radius:12px;background:var(--light-grey);border:1px solid var(--grey-200);padding:32px;min-height:280px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.feature-mockup{width:100%;border-radius:8px;background:white;box-shadow:0 4px 24px rgba(0,0,0,0.08);padding:20px;font-size:0.85rem}
+.chat-bubble{padding:12px 16px;border-radius:12px;margin-bottom:8px;max-width:85%;line-height:1.5}
+.chat-bot{background:var(--grey-100);color:var(--near-black);border-bottom-left-radius:4px}
+.chat-user{background:var(--red);color:white;margin-left:auto;border-bottom-right-radius:4px}
+.chat-actions{display:flex;gap:8px;margin-top:12px}
+.chat-actions span{padding:6px 12px;border-radius:6px;font-size:0.78rem;font-weight:600;cursor:default}
+.chat-actions .wa{background:#007A3D;color:white}
+.chat-actions .tg{background:#007A3D;color:white}
+.chat-actions .cp{background:var(--slate-200);color:var(--slate-600)}
+.phone-notif{background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.1);padding:16px;display:flex;gap:12px;align-items:flex-start;max-width:320px}
+.phone-notif .icon{width:40px;height:40px;border-radius:10px;background:var(--green);display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;flex-shrink:0}
+.phone-notif .msg{font-size:0.82rem;color:var(--grey-600);line-height:1.5}
+.phone-notif .msg strong{color:var(--black);display:block;margin-bottom:2px;font-size:0.85rem}
+.notif-buttons{display:flex;gap:6px;margin-top:8px}
+.notif-buttons span{padding:4px 10px;border-radius:4px;font-size:0.72rem;font-weight:600}
+.notif-buttons .yes{background:var(--green-light);color:var(--green-dim)}
+.notif-buttons .receipt{background:var(--grey-100);color:var(--black)}
+.notif-buttons .later{background:var(--grey-100);color:var(--grey-500)}
+.cal-mock{width:100%}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:0.75rem}
+.cal-header{text-align:center;padding:6px 0;font-weight:600;color:var(--slate-400);font-size:0.7rem}
+.cal-day{background:white;padding:4px 6px;min-height:48px;border-radius:4px;position:relative}
+.cal-day .num{font-weight:600;color:var(--grey-600);font-size:0.72rem;margin-bottom:3px}
+.cal-day.today .num{background:var(--green);color:white;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem}
+.cal-day .pill{font-size:0.6rem;padding:2px 4px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill-green{background:var(--green-50);color:var(--green-500);border-left:2px solid var(--green-500)}
+.pill-amber{background:var(--amber-50);color:var(--amber-500);border-left:2px solid var(--amber-500)}
+.pill-red{background:var(--red-50);color:var(--red-500);border-left:2px solid var(--red-500)}
+.status-row{display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:0.75rem}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+
+/* WHO IS THIS FOR */
+.audience-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.audience-card{padding:28px;border-radius:12px;border:1px solid var(--grey-200);background:white;transition:border-color 0.2s,box-shadow 0.2s}
+.audience-card:hover{border-color:var(--green);box-shadow:0 4px 16px rgba(0,122,61,0.1)}
+.audience-card .icon{font-size:1.8rem;margin-bottom:12px}
+.audience-card h3{font-size:1.05rem;font-weight:700;margin-bottom:6px}
+.audience-card p{color:var(--grey-500);font-size:0.9rem;line-height:1.6}
+
+/* PRICING */
+.pricing-section{background:var(--light-grey)}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start}
+.pricing-card{background:white;border:1px solid var(--grey-200);border-radius:16px;padding:36px 28px;position:relative;transition:box-shadow 0.2s}
+.pricing-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.06)}
+.pricing-card.featured{border-color:var(--green);box-shadow:0 4px 24px rgba(0,122,61,0.12);border-width:2px}
+.pricing-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--green);color:white;padding:4px 16px;border-radius:20px;font-size:0.75rem;font-weight:700}
+.pricing-card h3{font-size:1.15rem;font-weight:700;margin-bottom:4px}
+.pricing-card .desc{color:var(--grey-500);font-size:0.88rem;margin-bottom:20px}
+.pricing-price{margin-bottom:24px}
+.pricing-price .amount{font-size:2.8rem;font-weight:800;letter-spacing:-0.03em;color:var(--black)}
+.pricing-price .period{color:var(--grey-500);font-size:0.9rem}
+.pricing-price .annual{color:var(--grey-400);font-size:0.82rem;margin-top:4px}
+.pricing-features{list-style:none;padding:0;margin-bottom:28px}
+.pricing-features li{padding:8px 0;font-size:0.9rem;color:var(--grey-600);display:flex;gap:10px;align-items:flex-start;line-height:1.5}
+.pricing-features li::before{content:"✓";color:var(--green);font-weight:700;flex-shrink:0}
+.pricing-btn{display:block;width:100%;padding:14px;border-radius:8px;text-align:center;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;transition:all 0.2s}
+.pricing-btn.primary{background:var(--green);color:white}
+.pricing-btn.primary:hover{background:var(--green-dark)}
+.pricing-btn.outline{background:white;color:var(--red);border:2px solid var(--red)}
+.pricing-btn.outline:hover{background:var(--red-light);color:var(--red-dark)}
+
+/* FAQ */
+.faq-list{max-width:720px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--grey-200);padding:20px 0}
+.faq-q{font-weight:600;font-size:1.05rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;color:var(--slate-900)}
+.faq-q::after{content:"+";font-size:1.4rem;color:var(--grey-400);transition:transform 0.2s;flex-shrink:0}
+.faq-item.open .faq-q::after{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;color:var(--grey-500);font-size:0.95rem;line-height:1.7}
+.faq-item.open .faq-a{max-height:300px;padding-top:12px}
+
+/* FOOTER CTA */
+.footer-cta{background:var(--black);color:white;text-align:center;padding:80px 24px}
+.footer-cta h2{font-size:clamp(1.8rem,3vw,2.4rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px}
+.footer-cta p{color:var(--grey-400);font-size:1.05rem;margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto}
+.footer-cta .btn-primary{background:var(--green);font-size:1.1rem;padding:16px 36px}
+.footer-cta .btn-primary:hover{background:var(--green-dark)}
+.footer-cta .dm-note{margin-top:24px;font-size:0.85rem;color:var(--grey-400)}
+
+/* FOOTER */
+footer{background:var(--near-black);color:var(--grey-400);padding:40px 24px;text-align:center;font-size:0.85rem}
+footer a{color:var(--grey-300)}
+footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:12px}
+
+
+/* HOW IT WORKS — VISUAL STEPS */
+.steps-visual{display:flex;flex-direction:column;gap:48px}
+.step-card{display:grid;grid-template-columns:auto 1fr 1fr;gap:24px;align-items:start;background:white;border:1px solid var(--grey-200);border-radius:16px;padding:32px;transition:box-shadow 0.2s}
+.step-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.06)}
+.step-num{width:40px;height:40px;border-radius:50%;background:var(--green);color:white;font-size:1.1rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content h3{font-size:1.2rem;font-weight:700;margin-bottom:8px;color:var(--black)}
+.step-content p{color:var(--grey-500);font-size:0.95rem;line-height:1.65}
+.step-mockup{border-radius:10px;overflow:hidden;border:1px solid var(--grey-200);background:var(--light-grey)}
+
+/* Mock form */
+.mock-form{padding:16px;font-size:0.8rem}
+.mock-header{font-weight:700;font-size:0.85rem;color:var(--black);padding-bottom:10px;border-bottom:1px solid var(--grey-200);margin-bottom:12px}
+.mock-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.mock-field label{display:block;font-size:0.68rem;color:var(--grey-500);font-weight:600;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.03em}
+.mock-input{background:white;border:1px solid var(--grey-200);border-radius:5px;padding:6px 10px;font-size:0.8rem;color:var(--black)}
+.mock-select{background:white;border:1px solid var(--grey-200);border-radius:5px;padding:6px 10px;font-size:0.8rem;color:var(--black)}
+.mock-section-label{font-size:0.75rem;font-weight:700;color:var(--black);margin-top:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.03em}
+.mock-lesson{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--grey-100);font-size:0.8rem}
+.mock-pill{padding:3px 10px;border-radius:4px;font-size:0.72rem;font-weight:700;color:white}
+.green-pill{background:var(--green)}
+.mock-time{font-weight:600;color:var(--black)}
+.mock-loc{color:var(--grey-500)}
+.mock-add-btn{margin-top:10px;font-size:0.78rem;color:var(--green);font-weight:600;cursor:default}
+
+/* Mock chat */
+.mock-chat{padding:16px;font-size:0.8rem}
+.mock-bubble{padding:12px 14px;border-radius:10px;margin-bottom:10px;line-height:1.55;font-size:0.8rem}
+.bot-bubble{background:white;color:var(--near-black);border:1px solid var(--grey-200);border-bottom-left-radius:3px}
+.mock-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.mock-btn-wa{padding:5px 12px;border-radius:5px;background:var(--green);color:white;font-size:0.72rem;font-weight:600}
+.mock-btn-tg{padding:5px 12px;border-radius:5px;background:#2CA5E0;color:white;font-size:0.72rem;font-weight:600}
+.mock-btn-cp{padding:5px 12px;border-radius:5px;background:var(--grey-100);color:var(--grey-600);font-size:0.72rem;font-weight:600}
+
+/* Mock reminders */
+.mock-reminder-box{border:1px solid var(--grey-200);border-radius:8px;padding:12px;margin-bottom:10px;background:white}
+.mock-reminder-box.dim{opacity:0.5}
+.mock-reminder-top{margin-bottom:10px}
+.mock-badge{padding:4px 10px;border-radius:4px;font-size:0.72rem;font-weight:700}
+.mock-badge.on{background:var(--green-light);color:var(--green)}
+.mock-badge.off{background:var(--grey-100);color:var(--grey-400)}
+.mock-last-sent{font-size:0.72rem;color:var(--grey-400);margin-top:8px}
+
+@media(max-width:768px){
+  .step-card{grid-template-columns:1fr;gap:16px}
+  .step-num{margin-bottom:-8px}
+  .mock-row{grid-template-columns:1fr}
+}
+
+
+/* ROTATING HEADLINE */
+.rotating-word-wrap{display:inline-block;position:relative;overflow:hidden;vertical-align:bottom;height:1.15em;min-width:180px}
+.rotating-word{display:inline-block;color:var(--green);position:absolute;left:0;bottom:0;white-space:nowrap;animation:none;transition:transform 0.4s ease,opacity 0.4s ease}
+.rotating-word.slide-out{transform:translateY(-110%);opacity:0}
+.rotating-word.slide-in{transform:translateY(110%);opacity:0}
+
+/* SCROLL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}
+.reveal-delay-2{transition-delay:0.2s}
+.reveal-delay-3{transition-delay:0.3s}
+
+/* PRICING TOGGLE */
+.pricing-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:40px}
+.pricing-toggle span{font-size:0.95rem;font-weight:500;color:var(--grey-400);transition:color 0.3s}
+.pricing-toggle span.active{color:var(--black);font-weight:700}
+.toggle-switch{width:52px;height:28px;background:var(--grey-300);border-radius:14px;cursor:pointer;position:relative;transition:background 0.3s}
+.toggle-switch.on{background:var(--green)}
+.toggle-knob{width:22px;height:22px;background:white;border-radius:50%;position:absolute;top:3px;left:3px;transition:left 0.3s;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
+.toggle-switch.on .toggle-knob{left:27px}
+.price-annual{display:none;font-size:0.82rem;color:var(--green);font-weight:600;margin-top:4px}
+.price-annual.show{display:block}
+.price-monthly{display:block}
+.price-monthly.hide{display:none}
+
+/* 3D TILT */
+.tilt-card{transition:transform 0.2s ease,box-shadow 0.2s ease}
+
+/* COUNTER ANIMATION */
+.counter{display:inline-block}
+
+/* INTERACTIVE DEMO */
+.demo-container{max-width:480px;margin:0 auto;background:white;border-radius:16px;border:1px solid var(--grey-200);overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.08)}
+.demo-header{background:var(--black);color:white;padding:14px 20px;font-weight:700;font-size:0.9rem;display:flex;align-items:center;gap:10px}
+.demo-header .dot{width:10px;height:10px;border-radius:50%}
+.demo-body{padding:20px;min-height:320px;display:flex;flex-direction:column;gap:12px}
+.demo-step{display:none;flex-direction:column;gap:12px;animation:fadeUp 0.4s ease}
+.demo-step.active{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.demo-input{padding:10px 14px;border:1px solid var(--grey-200);border-radius:8px;font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s}
+.demo-input:focus{border-color:var(--green)}
+.demo-btn{padding:10px 20px;border-radius:8px;font-weight:600;font-size:0.9rem;border:none;cursor:pointer;transition:all 0.2s}
+.demo-btn-green{background:var(--green);color:white}
+.demo-btn-green:hover{background:var(--green-dark)}
+.demo-label{font-size:0.82rem;font-weight:600;color:var(--grey-500);text-transform:uppercase;letter-spacing:0.04em}
+.demo-bubble{padding:14px 16px;border-radius:12px;font-size:0.88rem;line-height:1.6;max-width:90%}
+.demo-bubble-bot{background:var(--light-grey);color:var(--near-black);border-bottom-left-radius:4px}
+.demo-bubble-bot .typing{display:inline-block}
+.demo-bubble-bot .typing span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--grey-400);margin:0 2px;animation:blink 1.2s infinite}
+.demo-bubble-bot .typing span:nth-child(2){animation-delay:0.2s}
+.demo-bubble-bot .typing span:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0.3}40%{opacity:1}}
+.demo-notif{background:white;border:1px solid var(--grey-200);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 2px 12px rgba(0,0,0,0.06);animation:slideIn 0.5s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.demo-notif-icon{width:36px;height:36px;border-radius:8px;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.demo-notif-text{font-size:0.82rem;color:var(--grey-600);line-height:1.5}
+.demo-notif-text strong{color:var(--black);display:block;margin-bottom:2px}
+.demo-notif-btns{display:flex;gap:6px;margin-top:8px}
+.demo-notif-btns span{padding:4px 10px;border-radius:5px;font-size:0.72rem;font-weight:600}
+.demo-progress{display:flex;gap:6px;justify-content:center;margin-top:16px}
+.demo-dot{width:8px;height:8px;border-radius:50%;background:var(--grey-300);transition:background 0.3s}
+.demo-dot.active{background:var(--green)}
+.demo-restart{text-align:center;margin-top:12px;font-size:0.85rem;color:var(--green);font-weight:600;cursor:pointer}
+.demo-restart:hover{text-decoration:underline}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .nav-links{display:none}
+  .nav-mobile{display:block}
+  .problem-grid,.steps,.audience-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr;max-width:420px;margin-left:auto;margin-right:auto}
+  .feature{grid-template-columns:1fr;gap:32px}
+  .feature:nth-child(even){direction:ltr}
+  section{padding:60px 20px}
+  .hero{padding:120px 20px 60px}
+}
+@media(max-width:480px){
+  .hero-buttons{flex-direction:column;align-items:center}
+  .hero-buttons .btn-primary,.hero-buttons .btn-secondary{width:100%;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div id="scroll-progress" style="position:fixed;top:0;left:0;height:3px;background:var(--green);width:0%;z-index:9999;transition:width 0.1s linear"></div>
+<div class="nav-wrap">
+<div class="nav-inner">
+  <a href="#" class="nav-logo">remind<span>client</span></a>
+  <nav class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+    <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app" class="nav-cta">Sign in</a>
+  </nav>
+  <button class="nav-mobile" onclick="document.querySelector('.nav-links').classList.toggle('show')" aria-label="Menu">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+</div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-inner">
+  <h1>Never chase a <span class="rotating-word-wrap"><span id="rotating-word" class="rotating-word">payment</span></span> again.</h1>
+  <p>RemindClient sends polite, AI-crafted payment and lesson reminders to your clients and students' parents — so you can focus on what you do and we do the reminders.</p>
+  <div class="hero-buttons">
+    <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app/" class="btn-primary">Start free trial — 1 month free</a>
+    <a href="#how" class="btn-secondary">See how it works</a>
+  </div>
+  <p class="hero-note">No credit card required. Cancel anytime.</p>
+</div>
+</section>
+
+<!-- PROBLEM -->
+<section>
+<div class="section-inner centered">
+  <p class="section-label">The problem</p>
+  <h2 class="section-title">Sound familiar?</h2>
+  <div class="problem-grid">
+    <div class="problem-card reveal">
+      <div class="emoji">🤔</div>
+      <h3>"Did they pay?"</h3>
+      <p>You serve 15 clients. Some pay on time, some don't. You're not sure who owes what — and checking your bank statements at midnight isn't a system.</p>
+    </div>
+    <div class="problem-card reveal reveal-delay-1">
+      <div class="emoji">😅</div>
+      <h3>"I feel paiseh to ask."</h3>
+      <p>You delivered great service. But the payment is 2 months overdue and you'd rather absorb the loss than make it awkward.</p>
+    </div>
+    <div class="problem-card reveal reveal-delay-2">
+      <div class="emoji">😩</div>
+      <h3>"Another WhatsApp to type."</h3>
+      <p>You draft the same reminder every month, personalise it for each client, copy-paste it 15 times. It takes an hour you don't bill for.</p>
+    </div>
+  </div>
+  <p class="problem-bottom">RemindClient eliminates all three — automatically, politely, and without you lifting a finger.</p>
+</div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="background:var(--light-grey)">
+<div class="section-inner centered">
+  <p class="section-label">How it works</p>
+  <h2 class="section-title">Three steps. Zero awkwardness.</h2>
+  <p class="section-subtitle">Set it up once. The bot handles the rest, every week, forever.</p>
+  <div class="steps-visual">
+
+    <!-- Step 1 -->
+    <div class="step-card reveal">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Add your clients once.</h3>
+        <p>Name, contact, amount, schedule. Takes 2 minutes per person, and you never enter it again.</p>
+      </div>
+      <div class="step-mockup">
+        <div class="mock-form">
+          <div class="mock-header">Client Overview</div>
+          <div class="mock-row">
+            <div class="mock-field">
+              <label>Student Name</label>
+              <div class="mock-input">Ahmad Irfan</div>
+            </div>
+            <div class="mock-field">
+              <label>Phone</label>
+              <div class="mock-input">9123 4567</div>
+            </div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-field">
+              <label>Payer Name</label>
+              <div class="mock-input">Mdm Rohana</div>
+            </div>
+            <div class="mock-field">
+              <label>Fee (SGD)</label>
+              <div class="mock-input">240</div>
+            </div>
+          </div>
+          <div class="mock-section-label">Lesson Schedule</div>
+          <div class="mock-lesson">
+            <span class="mock-pill green-pill">Mon</span>
+            <span class="mock-time">09:00</span>
+            <span class="mock-loc">Student's home</span>
+          </div>
+          <div class="mock-lesson">
+            <span class="mock-pill green-pill">Wed</span>
+            <span class="mock-time">14:00</span>
+            <span class="mock-loc">Zoom</span>
+          </div>
+          <div class="mock-add-btn">+ Add Lesson</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card reveal reveal-delay-1">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>AI drafts the perfect reminder.</h3>
+        <p>RemindClient's AI reads each client's profile and writes a polite, personalised message. Review, edit, or just let it send.</p>
+      </div>
+      <div class="step-mockup">
+        <div class="mock-chat">
+          <div class="mock-header">AI Chat — Ahmad Irfan</div>
+          <div class="mock-bubble bot-bubble">
+            Assalamualaikum Mdm Rohana,<br><br>
+            This is an automated reminder from <strong>Your Tutor</strong>.<br><br>
+            I will be sending lesson and payment reminders for <strong>Ahmad Irfan</strong>. You can:<br>
+            • Tap ✅ <em>I've Paid</em> to confirm payment<br>
+            • Tap 📸 <em>Send Receipt</em> to upload proof<br>
+            • Tap ⏰ <em>Later</em> if you need more time<br><br>
+            Thank you for your support! 🙏
+          </div>
+          <div class="mock-actions">
+            <span class="mock-btn-wa">💬 Send via WhatsApp</span>
+            <span class="mock-btn-tg">✈️ Send via Telegram</span>
+            <span class="mock-btn-cp">📋 Copy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card reveal reveal-delay-2">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Reminders go out automatically.</h3>
+        <p>Pick the day and time. The bot sends via Telegram. They get a gentle nudge. You get paid. Relationship stays warm.</p>
+      </div>
+      <div class="step-mockup">
+        <div class="mock-form">
+          <div class="mock-header">Auto Reminders — Ahmad Irfan</div>
+          <div class="mock-reminder-box">
+            <div class="mock-reminder-top">
+              <span class="mock-badge on">Reminder 1 — ON</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-field">
+                <label>Type</label>
+                <div class="mock-select">Payment ▾</div>
+              </div>
+              <div class="mock-field">
+                <label>For Lesson</label>
+                <div class="mock-select">Mon 09:00 ▾</div>
+              </div>
+            </div>
+            <div class="mock-row">
+              <div class="mock-field">
+                <label>Day</label>
+                <div class="mock-select">Sunday ▾</div>
+              </div>
+              <div class="mock-field">
+                <label>Time</label>
+                <div class="mock-select">20:00 ▾</div>
+              </div>
+            </div>
+            <div class="mock-last-sent">Last sent: Sun 1 Sep, 20:02 ✅</div>
+          </div>
+          <div class="mock-reminder-box dim">
+            <div class="mock-reminder-top">
+              <span class="mock-badge off">Reminder 2 — OFF</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-field">
+                <label>Type</label>
+                <div class="mock-select">Lesson ▾</div>
+              </div>
+              <div class="mock-field">
+                <label>For Lesson</label>
+                <div class="mock-select">Wed 14:00 ▾</div>
+              </div>
+            </div>
+            <div class="mock-row">
+              <div class="mock-field">
+                <label>Day</label>
+                <div class="mock-select">Tuesday ▾</div>
+              </div>
+              <div class="mock-field">
+                <label>Time</label>
+                <div class="mock-select">18:00 ▾</div>
+              </div>
+            </div>
+            <div class="mock-last-sent">Last sent: never</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Interactive Demo -->
+  <div style="margin-top:64px" class="reveal">
+    <div style="text-align:center;margin-bottom:24px">
+      <p style="font-size:1.1rem;font-weight:700;color:var(--black)">Try it yourself — takes 10 seconds</p>
+      <p style="font-size:0.9rem;color:var(--grey-500)">Type a name and see what happens.</p>
+    </div>
+    <div class="demo-container">
+      <div class="demo-header">
+        <div class="dot" style="background:var(--red)"></div>
+        <div class="dot" style="background:var(--amber)"></div>
+        <div class="dot" style="background:var(--green)"></div>
+        <span style="margin-left:8px">RemindClient</span>
+      </div>
+      <div class="demo-body">
+        <!-- Step 1: Enter name -->
+        <div class="demo-step active" id="demo-1">
+          <p class="demo-label">Step 1 — Add a client</p>
+          <input class="demo-input" id="demo-name" type="text" placeholder="Type a student name..." autofocus>
+          <input class="demo-input" id="demo-fee" type="text" placeholder="Monthly fee (e.g. 240)" value="240">
+          <button class="demo-btn demo-btn-green" onclick="demoStep2()">Add Client →</button>
+        </div>
+        <!-- Step 2: AI drafts -->
+        <div class="demo-step" id="demo-2">
+          <p class="demo-label">Step 2 — AI drafts the reminder</p>
+          <div class="demo-bubble demo-bubble-bot" id="demo-typing">
+            <div class="typing"><span></span><span></span><span></span></div>
+          </div>
+          <div class="demo-bubble demo-bubble-bot" id="demo-message" style="display:none"></div>
+          <div id="demo-send-btns" style="display:none;flex-wrap:wrap;gap:8px">
+            <button class="demo-btn demo-btn-green" onclick="demoStep3()" style="font-size:0.85rem">✈️ Send via Telegram →</button>
+          </div>
+        </div>
+        <!-- Step 3: Notification -->
+        <div class="demo-step" id="demo-3">
+          <p class="demo-label">Step 3 — Client receives it instantly</p>
+          <div class="demo-notif" id="demo-notif">
+            <div class="demo-notif-icon">✈️</div>
+            <div class="demo-notif-text">
+              <strong>RemindClient Bot</strong>
+              <span id="demo-notif-msg"></span>
+              <div class="demo-notif-btns">
+                <span style="background:var(--green-light);color:var(--green)">✅ I've Paid</span>
+                <span style="background:var(--grey-100);color:var(--black)">📸 Receipt</span>
+                <span style="background:var(--grey-100);color:var(--grey-500)">⏰ Later</span>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:center;margin-top:16px;padding:12px;background:var(--green-light);border-radius:8px;font-size:0.88rem;color:var(--green);font-weight:600">
+            ✅ Done — and it repeats every week, automatically.
+          </div>
+        </div>
+      </div>
+      <div class="demo-progress">
+        <div class="demo-dot active" id="dot-1"></div>
+        <div class="demo-dot" id="dot-2"></div>
+        <div class="demo-dot" id="dot-3"></div>
+      </div>
+      <div class="demo-restart" id="demo-restart" style="display:none" onclick="demoReset()">↺ Try again</div>
+      <div style="height:16px"></div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+<div class="section-inner">
+  <div class="centered" style="margin-bottom:64px">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">Everything you need. Nothing you don't.</h2>
+  </div>
+
+  <!-- Feature 1: AI Draft -->
+  <div class="feature reveal">
+    <div class="feature-text">
+      <h3>AI Reminder Drafting</h3>
+      <p>The AI reads your client's actual data — name, amount due, last payment date — and writes a reminder that sounds like you wrote it yourself.</p>
+      <ul>
+        <li>"Make it shorter."</li>
+        <li>"Add my PayNow number."</li>
+        <li>"Say it in Malay."</li>
+        <li>"Make it more urgent — third month already."</li>
+      </ul>
+    </div>
+    <div class="feature-visual">
+      <div class="feature-mockup">
+        <div class="chat-bubble chat-user">Draft a payment reminder for Ahmad — 2 months overdue</div>
+        <div class="chat-bubble chat-bot">Hi Mdm Rohana, gentle reminder that Ahmad's tuition fee of SGD 240 is due. PayNow to 9123 4567. Thank you! 🙏</div>
+        <div class="chat-bubble chat-user">Make it shorter and add "for September and October"</div>
+        <div class="chat-bubble chat-bot">Hi Mdm Rohana, Ahmad's fee of SGD 240 (Sep + Oct) is due. PayNow to 9123 4567. Thank you! 🙏</div>
+        <div class="chat-actions">
+          <span class="wa">💬 WhatsApp</span>
+          <span class="tg">✈️ Telegram</span>
+          <span class="cp">📋 Copy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 2: Auto-send -->
+  <div class="feature reveal">
+    <div class="feature-text">
+      <h3>Auto-Send via Telegram</h3>
+      <p>Set 2 automatic reminders per client — pick the day and time. That's it.</p>
+      <p>Every week, the bot sends on schedule. No tapping, no copy-pasting, no remembering. Works while you're teaching. Works while you're on holiday.</p>
+    </div>
+    <div class="feature-visual">
+      <div class="phone-notif">
+        <div class="icon">✈️</div>
+        <div class="msg">
+          <strong>RemindClient Bot</strong>
+          Hi Mdm Rohana, gentle reminder that Ahmad's tuition fee of SGD 240 is due. PayNow to 9123 4567. Thank you! 🙏
+          <div class="notif-buttons">
+            <span class="yes">✅ I've Paid</span>
+            <span class="receipt">📸 Receipt</span>
+            <span class="later">⏰ Later</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 3: WhatsApp -->
+  <div class="feature reveal">
+    <div class="feature-text">
+      <h3>WhatsApp One-Tap Send</h3>
+      <p>For clients not on Telegram: tap once. WhatsApp opens. Message is already written — amount, name, PayNow details, everything.</p>
+      <p>One tap. One second. Zero typing.</p>
+    </div>
+    <div class="feature-visual" style="background:#E6F5ED;border-color:#C2E5D0">
+      <div class="feature-mockup" style="background:#F5F5F5;padding:16px;border-radius:12px">
+        <div style="background:#E6F5ED;padding:10px 14px;border-radius:8px;border-bottom-right-radius:2px;font-size:0.85rem;color:#303030;max-width:280px;margin-left:auto;line-height:1.5">
+          Hi Mdm Rohana, Ahmad's fee of SGD 240 (Sep + Oct) is due. PayNow to 9123 4567. Thank you! 🙏
+          <div style="text-align:right;font-size:0.7rem;color:#8D9FA5;margin-top:4px">10:02 AM ✓✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 4: Calendar -->
+  <div class="feature reveal">
+    <div class="feature-text">
+      <h3>Visual Calendar</h3>
+      <p>See your entire month at a glance. Colour-coded by payment status. Tap a day to see who's booked. Tap a session to edit it.</p>
+    </div>
+    <div class="feature-visual">
+      <div class="cal-mock">
+        <div class="cal-grid">
+          <div class="cal-header">Mon</div><div class="cal-header">Tue</div><div class="cal-header">Wed</div><div class="cal-header">Thu</div><div class="cal-header">Fri</div><div class="cal-header">Sat</div><div class="cal-header">Sun</div>
+          <div class="cal-day"><div class="num">1</div><div class="pill pill-green">09:00 Ahmad</div></div>
+          <div class="cal-day"><div class="num">2</div></div>
+          <div class="cal-day"><div class="num">3</div><div class="pill pill-amber">14:00 Priya</div></div>
+          <div class="cal-day"><div class="num">4</div></div>
+          <div class="cal-day"><div class="num">5</div><div class="pill pill-red">16:00 Wei Ling</div></div>
+          <div class="cal-day"><div class="num">6</div><div class="pill pill-green">09:00 Marcus</div></div>
+          <div class="cal-day"><div class="num">7</div></div>
+          <div class="cal-day today"><div class="num">8</div><div class="pill pill-green">10:00 Ahmad</div></div>
+          <div class="cal-day"><div class="num">9</div></div>
+          <div class="cal-day"><div class="num">10</div><div class="pill pill-amber">14:00 Priya</div></div>
+          <div class="cal-day"><div class="num">11</div></div>
+          <div class="cal-day"><div class="num">12</div><div class="pill pill-red">16:00 Wei Ling</div><div class="pill pill-green">17:00 Siti</div></div>
+          <div class="cal-day"><div class="num">13</div><div class="pill pill-green">09:00 Marcus</div></div>
+          <div class="cal-day"><div class="num">14</div></div>
+        </div>
+        <div class="status-row">
+          <span><span class="status-dot" style="background:var(--green)"></span> Paid</span>
+          <span><span class="status-dot" style="background:var(--amber-500)"></span> Due</span>
+          <span><span class="status-dot" style="background:var(--red-500)"></span> Overdue</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 5: Payment Confirmation -->
+  <div class="feature reveal">
+    <div class="feature-text">
+      <h3>Interactive Payment Confirmation</h3>
+      <p>When your client receives a reminder, they can tap "I've Paid" or send a payment screenshot — right there in the chat.</p>
+      <p>You get notified instantly. One tap to confirm. Payment status updates automatically. Receipt saved.</p>
+    </div>
+    <div class="feature-visual">
+      <div style="display:flex;flex-direction:column;gap:16px;width:100%">
+        <div class="phone-notif">
+          <div class="icon" style="background:var(--green)">✅</div>
+          <div class="msg">
+            <strong>Payment Verification</strong>
+            Mdm Rohana says she has paid Ahmad's fee of SGD 240.
+            <div class="notif-buttons" style="margin-top:10px">
+              <span class="yes" style="padding:6px 14px">✅ Confirm</span>
+              <span class="later" style="padding:6px 14px;background:var(--red-light);color:var(--red)">❌ Reject</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 6: Calendar subscription -->
+  <div class="feature reveal">
+    <div class="feature-text">
+      <h3>Calendar Subscription for Clients</h3>
+      <p>Clients subscribe once — one tap on iPhone, one tap on Android. Every session appears in their phone's native calendar automatically.</p>
+      <p>When you change a session time, their calendar updates automatically. No app to install. No account to create.</p>
+    </div>
+    <div class="feature-visual">
+      <div style="text-align:center">
+        <div style="font-size:3rem;margin-bottom:16px">📅</div>
+        <div style="font-size:0.95rem;color:var(--black);font-weight:600;margin-bottom:8px">One link. Every device.</div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <span style="padding:8px 16px;border-radius:8px;background:var(--black);color:white;font-size:0.82rem;font-weight:600">📱 iPhone — tap Subscribe</span>
+          <span style="padding:8px 16px;border-radius:8px;background:var(--green);color:white;font-size:0.82rem;font-weight:600">📱 Android — tap Add</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- WHO IS THIS FOR -->
+<section style="background:var(--light-grey)">
+<div class="section-inner centered">
+  <p class="section-label" style="color:var(--red)">Who is this for</p>
+  <h2 class="section-title">Built for anyone who provides a service and needs to remind clients.</h2>
+  <p class="section-subtitle">If you provide a service and your clients need reminding — this is for you.</p>
+  <div class="audience-grid">
+    <div class="audience-card reveal">
+      <div class="icon">🎓</div>
+      <h3>Tutors & Teachers</h3>
+      <p>Private tutors, home tutors, music teachers — remind parents about fees and upcoming lessons automatically.</p>
+    </div>
+    <div class="audience-card reveal reveal-delay-1">
+      <div class="icon">🕌</div>
+      <h3>Asatizah & Religious Teachers</h3>
+      <p>Quran teachers, ustaz/ustazah — send polite reminders without the awkwardness. Teaching is ibadah; collecting shouldn't be a burden.</p>
+    </div>
+    <div class="audience-card reveal reveal-delay-2">
+      <div class="icon">💪</div>
+      <h3>Coaches & Trainers</h3>
+      <p>Fitness coaches, martial arts instructors, swimming coaches — your clients stay on track with session and payment reminders.</p>
+    </div>
+    <div class="audience-card reveal reveal-delay-0">
+      <div class="icon">🏠</div>
+      <h3>Landlords & Property Owners</h3>
+      <p>Tenants who "forgot" to pay rent. Set a monthly reminder and the bot asks for you — every single month, on time.</p>
+    </div>
+    <div class="audience-card reveal reveal-delay-1">
+      <div class="icon">🏢</div>
+      <h3>Freelancers & Service Providers</h3>
+      <p>Designers, photographers, consultants — stop sending awkward "just following up" emails. Let the bot follow up for you.</p>
+    </div>
+    <div class="audience-card reveal reveal-delay-2">
+      <div class="icon">💼</div>
+      <h3>Anyone Who Provides a Service</h3>
+      <p>If someone owes you for a service you've delivered and you'd rather not be the one who asks — RemindClient asks for you.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="pricing-section">
+<div class="section-inner centered">
+  <p class="section-label" style="color:var(--red)">Pricing</p>
+  <h2 class="section-title">Simple pricing. No surprises.</h2>
+  <p class="section-subtitle">Starter comes with a 1-month free trial. No credit card required.</p>
+  <div class="pricing-toggle">
+    <span class="active" id="toggle-monthly">Monthly</span>
+    <div class="toggle-switch" id="pricing-switch" onclick="togglePricing()">
+      <div class="toggle-knob"></div>
+    </div>
+    <span id="toggle-annual">Annual <span style="color:var(--green);font-weight:600">(save up to 17%)</span></span>
+  </div>
+  <div class="pricing-grid">
+
+    <div class="pricing-card reveal tilt-card">
+      <h3>Starter</h3>
+      <p class="desc">For freelancers and solo service providers</p>
+      <div class="pricing-price">
+        <span class="amount" data-monthly="10" data-annual="100">S$10</span><span class="period" data-monthly="/month" data-annual="/year">/month</span>
+        <div class="price-annual" id="save-starter">Save S$20/year</div>
+      </div>
+      <ul class="pricing-features">
+        <li>Up to 15 clients</li>
+        <li>AI reminder drafting (20/day)</li>
+        <li>2 auto-reminders per client</li>
+        <li>Telegram auto-send</li>
+        <li>WhatsApp one-tap send</li>
+        <li>Visual calendar</li>
+        <li>Calendar subscription for clients</li>
+        <li>Payment tracking</li>
+      </ul>
+      <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app/" class="pricing-btn primary" style="display:block;text-decoration:none">Start free trial — 1 month free</a>
+    </div>
+
+    <div class="pricing-card featured reveal reveal-delay-1 tilt-card">
+      <div class="pricing-badge">Most popular</div>
+      <h3>Professional</h3>
+      <p class="desc">For busy professionals with serious volume</p>
+      <div class="pricing-price">
+        <span class="amount" data-monthly="25" data-annual="250">S$25</span><span class="period" data-monthly="/month" data-annual="/year">/month</span>
+        <div class="price-annual" id="save-pro">Save S$50/year</div>
+      </div>
+      <ul class="pricing-features">
+        <li>Everything in Starter</li>
+        <li>Up to 50 clients</li>
+        <li>AI drafting (50/day)</li>
+        <li>Monthly payment report</li>
+        <li>Bulk actions</li>
+        <li>Session notes per client</li>
+        <li>Custom reminder templates</li>
+      </ul>
+      <a href="mailto:fahmymahamud@gmail.com?subject=Book%20a%20RemindClient%20Demo&body=I%20want%20to%20book%20a%20demo." class="pricing-btn outline" style="display:block;text-decoration:none">Book a Demo</a>
+    </div>
+
+    <div class="pricing-card reveal reveal-delay-2 tilt-card">
+      <h3>Centre</h3>
+      <p class="desc">For organisations with multiple staff</p>
+      <div class="pricing-price">
+        <span class="amount" data-monthly="80" data-annual="800">S$80</span><span class="period" data-monthly="/month" data-annual="/year">/month</span>
+        <div class="price-annual" id="save-centre">Save S$160/year</div>
+      </div>
+      <ul class="pricing-features">
+        <li>Everything in Professional</li>
+        <li>Up to 200 clients (+S$0.50 each after)</li>
+        <li>Unlimited user accounts</li>
+        <li>Admin dashboard</li>
+        <li>Role-based access control</li>
+        <li>Revenue analytics</li>
+        <li>CSV import</li>
+        <li>Custom branding</li>
+        <li>Priority support</li>
+      </ul>
+      <a href="mailto:fahmymahamud@gmail.com?subject=Book%20a%20RemindClient%20Demo&body=I%20want%20to%20book%20a%20demo." class="pricing-btn outline" style="display:block;text-decoration:none">Book a Demo</a>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+<div class="section-inner">
+  <div class="centered" style="margin-bottom:48px">
+    <p class="section-label">FAQ</p>
+    <h2 class="section-title">Questions people actually ask.</h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Is my data safe?</div>
+      <div class="faq-a">Yes. Every account's data is completely isolated — you can never see another person's clients, and they can never see yours. We use Google Cloud with server-side security. Your data never leaves Singapore's servers.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Do my clients need to install an app?</div>
+      <div class="faq-a">No. Reminders arrive via Telegram or WhatsApp — apps they already use. Calendar subscriptions work with iPhone or Android's built-in calendar. Zero downloads, zero setup for them.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I use this for something other than tutoring?</div>
+      <div class="faq-a">Absolutely. Anywhere you need to politely remind someone about a payment or an appointment — tenants, freelance clients, shared expenses, regular bookings — RemindClient handles it. The AI adapts to your context.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I write my own reminder messages?</div>
+      <div class="faq-a">Yes. The AI drafts a suggestion, but you can edit it, rewrite it, or type your own from scratch. You can also ask the AI to change the tone: "make it more formal", "translate to Malay", "add my PayNow QR link".</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What happens after the free trial?</div>
+      <div class="faq-a">You pick a plan and pay via PayNow (bank transfer coming soon). If you don't pick a plan, your account simply stops sending reminders — your data stays safe and accessible for 30 days.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">I run an organisation, not a solo practice. Does this work for us?</div>
+      <div class="faq-a">Yes — the Centre plan is built for exactly this. Each staff member gets their own login and sees only their own clients. The admin sees everyone: all staff, all clients, all payments, one dashboard.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What about WhatsApp auto-send?</div>
+      <div class="faq-a">We currently support Telegram for automatic sending and WhatsApp for one-tap manual send. Full WhatsApp Business API auto-send is coming soon and will be included in the Centre plan at no extra cost.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER CTA -->
+<div class="footer-cta">
+  <h2>You provide the service. We handle the reminders.</h2>
+  <p>Start your 1-month free trial — no card, no commitment, no awkward conversations.</p>
+  <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app/" class="btn-primary">Start Free Trial</a>
+  <p class="dm-note">Questions? DM us "REMIND" on Instagram <a href="https://instagram.com/careershifttechguy" style="color:var(--green)">@careershifttechguy</a></p>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+    <a href="https://instagram.com/careershifttechguy">Instagram</a>
+  </div>
+  <p>RemindClient by Fahmy Mahamud · ShiftedTech · 2026</p>
+</footer>
+
+
+<script>
+// ===== SCROLL PROGRESS BAR =====
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('scroll-progress').style.width = pct + '%';
+});
+
+// ===== ROTATING HEADLINE =====
+const words = ['payment', 'tenant', 'student fee', 'client', 'invoice'];
+let wordIdx = 0;
+const el = document.getElementById('rotating-word');
+function rotateWord() {
+  el.classList.add('slide-out');
+  setTimeout(() => {
+    wordIdx = (wordIdx + 1) % words.length;
+    el.textContent = words[wordIdx];
+    el.classList.remove('slide-out');
+    el.classList.add('slide-in');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => el.classList.remove('slide-in'));
+    });
+  }, 400);
+}
+setInterval(rotateWord, 2500);
+
+// ===== SCROLL REVEAL =====
+const reveals = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }});
+}, { threshold: 0.15 });
+reveals.forEach(el => revealObs.observe(el));
+
+// ===== PRICING TOGGLE =====
+let isAnnual = false;
+function togglePricing() {
+  isAnnual = !isAnnual;
+  const sw = document.getElementById('pricing-switch');
+  sw.classList.toggle('on', isAnnual);
+  document.getElementById('toggle-monthly').classList.toggle('active', !isAnnual);
+  document.getElementById('toggle-annual').classList.toggle('active', isAnnual);
+  document.querySelectorAll('.pricing-price .amount').forEach(el => {
+    const val = isAnnual ? el.dataset.annual : el.dataset.monthly;
+    if (val) { el.style.transform = 'scale(0.8)'; el.style.opacity = '0.5';
+      setTimeout(() => { el.textContent = 'S$' + val; el.style.transform = 'scale(1)'; el.style.opacity = '1'; }, 150);
+    }
+  });
+  document.querySelectorAll('.pricing-price .period').forEach(el => {
+    const val = isAnnual ? el.dataset.annual : el.dataset.monthly;
+    if (val) el.textContent = val;
+  });
+  document.querySelectorAll('.price-annual').forEach(el => el.classList.toggle('show', isAnnual));
+}
+
+// ===== 3D TILT ON CARDS =====
+document.querySelectorAll('.tilt-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = `perspective(800px) rotateY(${x*6}deg) rotateX(${-y*6}deg) scale(1.02)`;
+    card.style.boxShadow = `${-x*10}px ${y*10}px 30px rgba(0,0,0,0.08)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = ''; card.style.boxShadow = '';
+  });
+});
+
+// ===== INTERACTIVE DEMO =====
+function setDemoStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('demo-'+i).classList.toggle('active', i===n);
+    document.getElementById('dot-'+i).classList.toggle('active', i<=n);
+  });
+  document.getElementById('demo-restart').style.display = n===3 ? 'block' : 'none';
+}
+
+function demoStep2() {
+  const name = document.getElementById('demo-name').value.trim() || 'Ahmad';
+  const fee = document.getElementById('demo-fee').value.trim() || '240';
+  setDemoStep(2);
+  // Show typing
+  document.getElementById('demo-typing').style.display = 'block';
+  document.getElementById('demo-message').style.display = 'none';
+  document.getElementById('demo-send-btns').style.display = 'none';
+  const msg = `Assalamualaikum, gentle reminder that ${name}'s monthly fee of SGD ${fee} is due. PayNow to 9123 4567. Thank you! 🙏`;
+  setTimeout(() => {
+    document.getElementById('demo-typing').style.display = 'none';
+    document.getElementById('demo-message').style.display = 'block';
+    document.getElementById('demo-message').innerHTML = msg;
+    document.getElementById('demo-send-btns').style.display = 'flex';
+    window._demoMsg = msg;
+  }, 1800);
+}
+
+function demoStep3() {
+  setDemoStep(3);
+  const short = window._demoMsg || "Reminder: fee is due.";
+  document.getElementById('demo-notif-msg').textContent = short.substring(0, 120) + (short.length > 120 ? '...' : '');
+}
+
+function demoReset() {
+  document.getElementById('demo-name').value = '';
+  document.getElementById('demo-fee').value = '240';
+  setDemoStep(1);
+}
+
+// ===== NAV MOBILE TOGGLE =====
+const style = document.createElement('style');
+style.textContent = '.nav-links.show{display:flex!important;position:absolute;top:64px;right:0;background:white;flex-direction:column;padding:16px 24px;border:1px solid var(--grey-200);border-radius:0 0 12px 12px;box-shadow:0 8px 24px rgba(0,0,0,0.08);gap:12px}';
+document.head.appendChild(style);
+</script>
+
+</body>
+</html>
+ENDOFFILE
