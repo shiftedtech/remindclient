@@ -219,7 +219,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 
 
 /* ROTATING HEADLINE */
-.rotating-word-wrap{display:inline-block;position:relative;overflow:hidden;vertical-align:bottom;height:1.15em;min-width:180px}
+.rotating-word-wrap{display:inline-block;position:relative;overflow:hidden;vertical-align:bottom;height:1.2em;min-width:300px}
 .rotating-word{display:inline-block;color:var(--green);position:absolute;left:0;bottom:0;white-space:nowrap;animation:none;transition:transform 0.4s ease,opacity 0.4s ease}
 .rotating-word.slide-out{transform:translateY(-110%);opacity:0}
 .rotating-word.slide-in{transform:translateY(110%);opacity:0}
@@ -283,6 +283,12 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 .demo-dot.active{background:var(--green)}
 .demo-restart{text-align:center;margin-top:12px;font-size:0.85rem;color:var(--green);font-weight:600;cursor:pointer}
 .demo-restart:hover{text-decoration:underline}
+
+
+/* STEP NUMBERS IN FEATURE LAYOUT */
+.step-number{width:36px;height:36px;border-radius:50%;background:var(--green);color:white;font-size:1rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:12px;flex-shrink:0}
+.steps-feature .feature{margin-bottom:64px}
+.steps-feature .feature:last-child{margin-bottom:0}
 
 /* RESPONSIVE */
 @media(max-width:768px){
@@ -911,6 +917,15 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 
 
 <script>
+
+// ===== LAND AT TOP ON PAGE LOAD =====
+window.addEventListener('load', () => {
+  window.scrollTo(0, 0);
+});
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
 // ===== SCROLL PROGRESS BAR =====
 window.addEventListener('scroll', () => {
   const h = document.documentElement;
@@ -1017,12 +1032,24 @@ function demoReset() {
   setDemoStep(1);
 }
 
+
+// ===== SCROLL TO TOP BUTTON =====
+const scrollBtn = document.getElementById('scroll-top');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 600) {
+    scrollBtn.style.display = 'flex';
+  } else {
+    scrollBtn.style.display = 'none';
+  }
+});
+
 // ===== NAV MOBILE TOGGLE =====
 const style = document.createElement('style');
 style.textContent = '.nav-links.show{display:flex!important;position:absolute;top:64px;right:0;background:white;flex-direction:column;padding:16px 24px;border:1px solid var(--grey-200);border-radius:0 0 12px 12px;box-shadow:0 8px 24px rgba(0,0,0,0.08);gap:12px}';
 document.head.appendChild(style);
 </script>
 
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top" style="position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:var(--black);color:white;border:none;cursor:pointer;font-size:1.2rem;display:none;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:99;transition:opacity 0.3s,transform 0.3s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">↑</button>
 </body>
 </html>
 ENDOFFILE
