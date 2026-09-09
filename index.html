@@ -221,7 +221,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 
 
 /* ROTATING HEADLINE */
-.rotating-word-wrap{display:inline-block;position:relative;overflow:hidden;vertical-align:bottom;height:1.2em;min-width:420px}
+.rotating-word-wrap{display:inline-block;position:relative;overflow:hidden;vertical-align:bottom;height:1.2em;min-width:430px}
 .rotating-word{display:inline-block;color:var(--green);position:absolute;left:0;bottom:0;white-space:nowrap;animation:none;transition:transform 0.4s ease,opacity 0.4s ease}
 .rotating-word.slide-out{transform:translateY(-110%);opacity:0}
 .rotating-word.slide-in{transform:translateY(110%);opacity:0}
@@ -936,7 +936,7 @@ window.addEventListener('scroll', () => {
 });
 
 // ===== ROTATING HEADLINE =====
-const words = ['payment', 'tenant', 'student fee', 'client', 'invoice'];
+const words = ['payment', 'tenant', 'student', 'client', 'invoice'];
 let wordIdx = 0;
 const el = document.getElementById('rotating-word');
 function rotateWord() {
