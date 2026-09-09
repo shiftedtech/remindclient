@@ -331,7 +331,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 <!-- HERO -->
 <section class="hero">
 <div class="hero-inner">
-  <h1>Never chase a <span class="rotating-word-wrap"><span id="rotating-word" class="rotating-word">payment</span></span> again.</h1>
+  <h1>Never chase<br><span class="rotating-word-wrap"><span id="rotating-word" class="rotating-word">payment</span></span><br>again.</h1>
   <p>RemindClient sends polite, AI-crafted payment and lesson reminders to your clients and students' parents — so you can focus on what you do and we do the reminders.</p>
   <div class="hero-buttons">
     <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app/" class="btn-primary">Start free trial — 1 month free</a>
@@ -936,7 +936,7 @@ window.addEventListener('scroll', () => {
 });
 
 // ===== ROTATING HEADLINE =====
-const words = ['payment', 'tenant', 'student fee', 'client', 'invoice'];
+const words = ['payments', 'tenants', 'student fees', 'clients', 'invoices'];
 let wordIdx = 0;
 const el = document.getElementById('rotating-word');
 function rotateWord() {
