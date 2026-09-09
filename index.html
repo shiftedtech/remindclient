@@ -957,8 +957,15 @@ setInterval(rotateWord, 2500);
 const reveals = document.querySelectorAll('.reveal');
 const revealObs = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }});
-}, { threshold: 0.15 });
-reveals.forEach(el => revealObs.observe(el));
+}, { threshold: 0.05 });
+reveals.forEach(el => {
+  const rect = el.getBoundingClientRect();
+  if (rect.top < window.innerHeight) {
+    el.classList.add('visible');
+  } else {
+    revealObs.observe(el);
+  }
+});
 
 // ===== PRICING TOGGLE =====
 let isAnnual = false;
