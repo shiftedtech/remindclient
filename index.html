@@ -278,7 +278,16 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 .demo-notif-icon{width:36px;height:36px;border-radius:8px;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
 .demo-notif-text{font-size:0.82rem;color:var(--grey-600);line-height:1.5}
 .demo-notif-text strong{color:var(--black);display:block;margin-bottom:2px}
-.demo-notif-btns{display:flex;gap:6px;margin-top:8px}
+.demo-notif-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.demo-select{background:white;color:var(--black);cursor:pointer;appearance:none;-webkit-appearance:none;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.demo-select:invalid{color:var(--grey-500)}
+.demo-hint{font-size:0.82rem;color:var(--grey-500);margin-bottom:8px}
+.demo-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.demo-day{padding:9px 0;border:1px solid var(--grey-200);border-radius:8px;background:white;font-family:inherit;font-size:0.8rem;font-weight:600;color:var(--grey-600);cursor:pointer;transition:all 0.15s}
+.demo-day:hover{border-color:var(--green);color:var(--green)}
+.demo-day.selected{background:var(--green);border-color:var(--green);color:white}
+.demo-missing{border-color:var(--red)!important;animation:demoNudge 0.3s ease}
+@keyframes demoNudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .demo-notif-btns span{padding:4px 10px;border-radius:5px;font-size:0.72rem;font-weight:600}
 .demo-progress{display:flex;gap:6px;justify-content:center;margin-top:16px}
 .demo-dot{width:8px;height:8px;border-radius:50%;background:var(--grey-300);transition:background 0.3s}
@@ -304,6 +313,8 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
   .hero{padding:120px 20px 60px}
 }
 @media(max-width:480px){
+  .demo-days{gap:4px}
+  .demo-day{font-size:0.72rem;padding:8px 0}
   .hero-buttons{flex-direction:column;align-items:center}
   .hero-buttons .btn-primary,.hero-buttons .btn-secondary{width:100%;text-align:center}
 }
@@ -521,7 +532,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
   <div style="margin-top:64px" class="reveal">
     <div style="text-align:center;margin-bottom:24px">
       <p style="font-size:1.1rem;font-weight:700;color:var(--black)">Try it yourself — takes 10 seconds</p>
-      <p style="font-size:0.9rem;color:var(--grey-500)">Type a name and see what happens.</p>
+      <p style="font-size:0.9rem;color:var(--grey-500)">Add a client, pick a reminder, and see what they receive.</p>
     </div>
     <div class="demo-container">
       <div class="demo-header">
@@ -531,11 +542,28 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
         <span style="margin-left:8px">RemindClient</span>
       </div>
       <div class="demo-body">
-        <!-- Step 1: Enter name -->
+        <!-- Step 1: Add a client -->
         <div class="demo-step active" id="demo-1">
           <p class="demo-label">Step 1 — Add a client</p>
-          <input class="demo-input" id="demo-name" type="text" placeholder="Type a student name..." autofocus>
-          <input class="demo-input" id="demo-fee" type="text" placeholder="Monthly fee (e.g. 240)" value="240">
+          <input class="demo-input" id="demo-name" type="text" placeholder="Client name (e.g. Ahmad)" maxlength="40">
+          <select class="demo-input demo-select" id="demo-type" onchange="demoTypeChanged()" required>
+            <option value="" selected disabled>What should we remind them about?</option>
+            <option value="payment">💰 Payment reminder</option>
+            <option value="lesson">📅 Lesson reminder</option>
+          </select>
+          <input class="demo-input" id="demo-amount" type="text" inputmode="decimal" placeholder="Amount in S$ (e.g. 240)" value="240" hidden>
+          <div id="demo-days-wrap" hidden>
+            <p class="demo-hint">Which day is the lesson?</p>
+            <div class="demo-days" id="demo-days">
+              <button type="button" class="demo-day" data-day="Monday">Mon</button>
+              <button type="button" class="demo-day" data-day="Tuesday">Tue</button>
+              <button type="button" class="demo-day" data-day="Wednesday">Wed</button>
+              <button type="button" class="demo-day" data-day="Thursday">Thu</button>
+              <button type="button" class="demo-day" data-day="Friday">Fri</button>
+              <button type="button" class="demo-day" data-day="Saturday">Sat</button>
+              <button type="button" class="demo-day" data-day="Sunday">Sun</button>
+            </div>
+          </div>
           <button class="demo-btn demo-btn-green" onclick="demoStep2()">Add Client →</button>
         </div>
         <!-- Step 2: AI drafts -->
@@ -546,27 +574,21 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
           </div>
           <div class="demo-bubble demo-bubble-bot" id="demo-message" style="display:none"></div>
           <div id="demo-send-btns" style="display:none;flex-wrap:wrap;gap:8px">
-            <button class="demo-btn demo-btn-green" onclick="demoStep3()" style="font-size:0.85rem">✈️ Send via Telegram →</button>
+            <button class="demo-btn demo-btn-green" onclick="demoStep3()" style="font-size:0.85rem">⏰ Set Auto-Reminder →</button>
           </div>
         </div>
-        <!-- Step 3: Notification -->
+        <!-- Step 3: Client receives it -->
         <div class="demo-step" id="demo-3">
-          <p class="demo-label">Step 3 — Client receives it instantly</p>
+          <p class="demo-label">Step 3 — Client receives it</p>
           <div class="demo-notif" id="demo-notif">
             <div class="demo-notif-icon">✈️</div>
             <div class="demo-notif-text">
               <strong>RemindClient Bot</strong>
               <span id="demo-notif-msg"></span>
-              <div class="demo-notif-btns">
-                <span style="background:var(--green-light);color:var(--green)">✅ I've Paid</span>
-                <span style="background:var(--grey-100);color:var(--black)">📸 Receipt</span>
-                <span style="background:var(--grey-100);color:var(--grey-500)">⏰ Later</span>
-              </div>
+              <div class="demo-notif-btns" id="demo-notif-btns"></div>
             </div>
           </div>
-          <div style="text-align:center;margin-top:16px;padding:12px;background:var(--green-light);border-radius:8px;font-size:0.88rem;color:var(--green);font-weight:600">
-            ✅ Done — and it repeats every week, automatically.
-          </div>
+          <div id="demo-outcome" style="text-align:center;margin-top:16px;padding:12px;background:var(--green-light);border-radius:8px;font-size:0.88rem;color:var(--green);font-weight:600"></div>
         </div>
       </div>
       <div class="demo-progress">
@@ -992,33 +1014,91 @@ function setDemoStep(n) {
   document.getElementById('demo-restart').style.display = n===3 ? 'block' : 'none';
 }
 
+// Two tracks: 'payment' asks for an amount, 'lesson' asks for a day.
+const demo = { type: '', day: '', msg: '' };
+
+const DEMO_REPLIES = {
+  payment: [
+    ['📸 Submit payment screenshot', 'background:var(--green-light);color:var(--green)'],
+    ['⏰ Remind later', 'background:var(--grey-100);color:var(--grey-500)'],
+  ],
+  lesson: [
+    ["✅ I'm coming", 'background:var(--green-light);color:var(--green)'],
+    ['❌ Not coming', 'background:var(--red-light);color:var(--red)'],
+    ['⏰ Remind later', 'background:var(--grey-100);color:var(--grey-500)'],
+  ],
+};
+
+const DEMO_OUTCOME = {
+  payment: "✅ Client received it — and you'll receive their payment screenshot.",
+  lesson: "✅ Client received it — and you'll get a reply on whether they're coming.",
+};
+
+function demoNudge(el) {
+  el.classList.remove('demo-missing');
+  void el.offsetWidth;
+  el.classList.add('demo-missing');
+  setTimeout(() => el.classList.remove('demo-missing'), 1200);
+}
+
+function demoTypeChanged() {
+  demo.type = document.getElementById('demo-type').value;
+  document.getElementById('demo-amount').hidden = demo.type !== 'payment';
+  document.getElementById('demo-days-wrap').hidden = demo.type !== 'lesson';
+}
+
+document.querySelectorAll('.demo-day').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.demo-day').forEach(b => b.classList.toggle('selected', b === btn));
+  demo.day = btn.dataset.day;
+}));
+
 function demoStep2() {
   const name = document.getElementById('demo-name').value.trim() || 'Ahmad';
-  const fee = document.getElementById('demo-fee').value.trim() || '240';
+  if (!demo.type) return demoNudge(document.getElementById('demo-type'));
+  if (demo.type === 'lesson' && !demo.day) return demoNudge(document.getElementById('demo-days'));
+
+  if (demo.type === 'payment') {
+    const raw = document.getElementById('demo-amount').value.trim().replace(/^S?\$\s*/i, '');
+    const amount = raw || '240';
+    demo.msg = `Hi ${name}! Just a friendly reminder that your payment of S$${amount} is due. `
+      + 'You can PayNow to 9123 4567. Thank you! 🙏';
+  } else {
+    demo.msg = `Hi ${name}! Just a reminder that your lesson is on ${demo.day}. `
+      + 'Please let me know if you can make it. See you then! 😊';
+  }
+
   setDemoStep(2);
-  // Show typing
   document.getElementById('demo-typing').style.display = 'block';
   document.getElementById('demo-message').style.display = 'none';
   document.getElementById('demo-send-btns').style.display = 'none';
-  const msg = `Assalamualaikum, gentle reminder that ${name}'s monthly fee of SGD ${fee} is due. PayNow to 9123 4567. Thank you! 🙏`;
   setTimeout(() => {
     document.getElementById('demo-typing').style.display = 'none';
-    document.getElementById('demo-message').style.display = 'block';
-    document.getElementById('demo-message').innerHTML = msg;
+    const bubble = document.getElementById('demo-message');
+    bubble.style.display = 'block';
+    bubble.textContent = demo.msg;   // text, not HTML: the name is whatever the visitor typed
     document.getElementById('demo-send-btns').style.display = 'flex';
-    window._demoMsg = msg;
   }, 1800);
 }
 
 function demoStep3() {
   setDemoStep(3);
-  const short = window._demoMsg || "Reminder: fee is due.";
-  document.getElementById('demo-notif-msg').textContent = short.substring(0, 120) + (short.length > 120 ? '...' : '');
+  document.getElementById('demo-notif-msg').textContent = demo.msg;
+  document.getElementById('demo-notif-btns').replaceChildren(...DEMO_REPLIES[demo.type].map(([label, style]) => {
+    const chip = document.createElement('span');
+    chip.textContent = label;
+    chip.style.cssText = style;
+    return chip;
+  }));
+  document.getElementById('demo-outcome').textContent = DEMO_OUTCOME[demo.type];
 }
 
 function demoReset() {
   document.getElementById('demo-name').value = '';
-  document.getElementById('demo-fee').value = '240';
+  document.getElementById('demo-type').value = '';
+  document.getElementById('demo-amount').value = '240';
+  document.querySelectorAll('.demo-day').forEach(b => b.classList.remove('selected'));
+  Object.assign(demo, { type: '', day: '', msg: '' });
+  demoTypeChanged();
   setDemoStep(1);
 }
 
@@ -1042,4 +1122,3 @@ document.head.appendChild(style);
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top" style="position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:var(--black);color:white;border:none;cursor:pointer;font-size:1.2rem;display:none;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:99;transition:opacity 0.3s,transform 0.3s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">↑</button>
 </body>
 </html>
-ENDOFFILE
