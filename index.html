@@ -100,6 +100,23 @@ section{padding:80px 24px}
 .phone-notif .icon{width:40px;height:40px;border-radius:10px;background:var(--green);display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;flex-shrink:0}
 .phone-notif .msg{font-size:0.82rem;color:var(--grey-600);line-height:1.5}
 .phone-notif .msg strong{color:var(--black);display:block;margin-bottom:2px;font-size:0.85rem}
+/* Payment tracking chat mock */
+.pt-chat{width:100%;max-width:340px;background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.1);padding:14px;display:flex;flex-direction:column;gap:10px;font-size:0.8rem;line-height:1.5}
+.pt-head{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--black);font-size:0.85rem;padding-bottom:10px;border-bottom:1px solid var(--grey-200)}
+.pt-avatar{width:28px;height:28px;border-radius:8px;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:0.85rem}
+.pt-bubble{max-width:85%;padding:9px 12px;border-radius:12px;color:var(--grey-600)}
+.pt-in{background:var(--light-grey);border-bottom-left-radius:4px;align-self:flex-start}
+.pt-out{background:var(--green-light);border-bottom-right-radius:4px;align-self:flex-end;padding:6px}
+.pt-time{display:block;text-align:right;font-size:0.66rem;color:var(--grey-400);margin-top:3px}
+.pt-out .pt-time{padding:0 4px}
+.pt-shot{background:white;border-radius:8px;padding:10px 12px;min-width:190px;border:1px solid var(--grey-200)}
+.pt-shot-top{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--green);font-size:0.76rem}
+.pt-check{width:16px;height:16px;border-radius:50%;background:var(--green);color:white;display:inline-flex;align-items:center;justify-content:center;font-size:0.62rem}
+.pt-amount{font-size:1.2rem;font-weight:800;color:var(--black);margin:4px 0 6px;letter-spacing:-0.02em}
+.pt-row{display:flex;justify-content:space-between;gap:12px;font-size:0.68rem;color:var(--grey-500);padding:2px 0;border-top:1px dashed var(--grey-200)}
+.pt-row span:last-child{color:var(--black);font-weight:600;text-align:right}
+.pt-stamp{align-self:center;background:var(--green);color:white;font-size:0.72rem;font-weight:700;padding:7px 16px;border-radius:12px;text-align:center;line-height:1.4}
+.pt-stamp small{display:block;font-size:0.66rem;font-weight:500;opacity:0.85}
 .notif-buttons{display:flex;gap:6px;margin-top:8px}
 .notif-buttons span{padding:4px 10px;border-radius:4px;font-size:0.72rem;font-weight:600}
 .notif-buttons .yes{background:var(--green-light);color:var(--green-dim)}
@@ -644,7 +661,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
     <div class="feature-text">
       <h3>Auto-Send via Telegram</h3>
       <p>Set 2 automatic reminders per client — pick the day and time. That's it.</p>
-      <p>Every week, the bot sends on schedule. No tapping, no copy-pasting, no remembering. Works while you're teaching. Works while you're on holiday.</p>
+      <p>The bot sends on schedule. No tapping, no copy-pasting, no remembering. Works while you're teaching. Works while you're on holiday.</p>
     </div>
     <div class="feature-visual">
       <div class="phone-notif">
@@ -713,26 +730,30 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
     </div>
   </div>
 
-  <!-- Feature 5: Payment Confirmation -->
+  <!-- Feature 5: Payment tracking -->
   <div class="feature reveal">
     <div class="feature-text">
-      <h3>Interactive Payment Confirmation</h3>
-      <p>When your client receives a reminder, they can tap "I've Paid" or send a payment screenshot — right there in the chat.</p>
-      <p>You get notified instantly. One tap to confirm. Payment status updates automatically. Receipt saved.</p>
+      <h3>Payment Tracking Without the Need to Ask</h3>
+      <p>Your client replies to the reminder with a screenshot of their transfer — right there in the chat. No chasing, no awkward "have you paid?" messages.</p>
+      <p>Every screenshot is kept in the chat, stamped with the date it arrived, so you always know who paid and when.</p>
     </div>
     <div class="feature-visual">
-      <div style="display:flex;flex-direction:column;gap:16px;width:100%">
-        <div class="phone-notif">
-          <div class="icon" style="background:var(--green)">✅</div>
-          <div class="msg">
-            <strong>Payment Verification</strong>
-            Mdm Rohana says she has paid Ahmad's fee of SGD 240.
-            <div class="notif-buttons" style="margin-top:10px">
-              <span class="yes" style="padding:6px 14px">✅ Confirm</span>
-              <span class="later" style="padding:6px 14px;background:var(--red-light);color:var(--red)">❌ Reject</span>
-            </div>
-          </div>
+      <div class="pt-chat">
+        <div class="pt-head"><span class="pt-avatar">✈️</span> RemindClient Bot</div>
+        <div class="pt-bubble pt-in">
+          Hi Ahmad! Just a friendly reminder that your payment of S$240 is due. You can PayNow to 9123 4567. Thank you! 🙏
+          <span class="pt-time">10:00 AM</span>
         </div>
+        <div class="pt-bubble pt-out">
+          <div class="pt-shot">
+            <div class="pt-shot-top"><span class="pt-check">✓</span> Transfer Successful</div>
+            <div class="pt-amount">S$240.00</div>
+            <div class="pt-row"><span>To</span><span>PayNow 9123 4567</span></div>
+            <div class="pt-row"><span>Date</span><span>12 Sep 2026, 10:14 AM</span></div>
+          </div>
+          <span class="pt-time">10:14 AM ✓✓</span>
+        </div>
+        <div class="pt-stamp">📸 Payment screenshot received<small>12 Sep 2026 · 10:14 AM</small></div>
       </div>
     </div>
   </div>
