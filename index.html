@@ -117,7 +117,7 @@ section{padding:80px 24px}
 .pt-row span:last-child{color:var(--black);font-weight:600;text-align:right}
 .pt-stamp{align-self:center;background:var(--green);color:white;font-size:0.72rem;font-weight:700;padding:7px 16px;border-radius:12px;text-align:center;line-height:1.4}
 .pt-stamp small{display:block;font-size:0.66rem;font-weight:500;opacity:0.85}
-.notif-buttons{display:flex;gap:6px;margin-top:8px}
+.notif-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .notif-buttons span{padding:4px 10px;border-radius:4px;font-size:0.72rem;font-weight:600}
 .notif-buttons .yes{background:var(--green-light);color:var(--green-dim)}
 .notif-buttons .receipt{background:var(--grey-100);color:var(--black)}
@@ -400,7 +400,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 <div class="section-inner centered">
   <p class="section-label">How it works</p>
   <h2 class="section-title">Three steps. Zero awkwardness.</h2>
-  <p class="section-subtitle">Set it up once. The bot handles the rest, every week, forever.</p>
+  <p class="section-subtitle">Set it up once. The bot handles the rest — automatically.</p>
   <div class="steps-visual">
 
     <!-- Step 1 -->
@@ -415,7 +415,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
           <div class="mock-header">Client Overview</div>
           <div class="mock-row">
             <div class="mock-field">
-              <label>Student Name</label>
+              <label>Client Name</label>
               <div class="mock-input">Ahmad Irfan</div>
             </div>
             <div class="mock-field">
@@ -429,7 +429,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
               <div class="mock-input">Mdm Rohana</div>
             </div>
             <div class="mock-field">
-              <label>Fee (SGD)</label>
+              <label>Fee (S$)</label>
               <div class="mock-input">240</div>
             </div>
           </div>
@@ -437,7 +437,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
           <div class="mock-lesson">
             <span class="mock-pill green-pill">Mon</span>
             <span class="mock-time">09:00</span>
-            <span class="mock-loc">Student's home</span>
+            <span class="mock-loc">Client's home</span>
           </div>
           <div class="mock-lesson">
             <span class="mock-pill green-pill">Wed</span>
@@ -460,13 +460,12 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
         <div class="mock-chat">
           <div class="mock-header">AI Chat — Ahmad Irfan</div>
           <div class="mock-bubble bot-bubble">
-            Assalamualaikum Mdm Rohana,<br><br>
-            This is an automated reminder from <strong>Your Tutor</strong>.<br><br>
-            I will be sending lesson and payment reminders for <strong>Ahmad Irfan</strong>. You can:<br>
-            • Tap ✅ <em>I've Paid</em> to confirm payment<br>
-            • Tap 📸 <em>Send Receipt</em> to upload proof<br>
-            • Tap ⏰ <em>Later</em> if you need more time<br><br>
-            Thank you for your support! 🙏
+            Hi Ahmad!<br><br>
+            This is <strong>Your Tutor</strong>'s reminder assistant. I'll send your lesson and payment reminders here. When one arrives, you can:<br>
+            • Tap 📸 <em>Submit payment screenshot</em> once you've paid<br>
+            • Tap ✅ <em>I'm coming</em> or ❌ <em>Not coming</em> for a lesson<br>
+            • Tap ⏰ <em>Remind later</em> if you need more time<br><br>
+            Thank you! 🙏
           </div>
           <div class="mock-actions">
             <span class="mock-btn-wa">💬 Send via WhatsApp</span>
@@ -644,9 +643,9 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
     <div class="feature-visual">
       <div class="feature-mockup">
         <div class="chat-bubble chat-user">Draft a payment reminder for Ahmad — 2 months overdue</div>
-        <div class="chat-bubble chat-bot">Hi Mdm Rohana, gentle reminder that Ahmad's tuition fee of SGD 240 is due. PayNow to 9123 4567. Thank you! 🙏</div>
+        <div class="chat-bubble chat-bot">Hi Ahmad! Just a friendly reminder that your payment of S$240 is due. You can PayNow to 9123 4567. Thank you! 🙏</div>
         <div class="chat-bubble chat-user">Make it shorter and add "for September and October"</div>
-        <div class="chat-bubble chat-bot">Hi Mdm Rohana, Ahmad's fee of SGD 240 (Sep + Oct) is due. PayNow to 9123 4567. Thank you! 🙏</div>
+        <div class="chat-bubble chat-bot">Hi Ahmad! Your S$240 for Sep + Oct is due. PayNow to 9123 4567. Thank you! 🙏</div>
         <div class="chat-actions">
           <span class="wa">💬 WhatsApp</span>
           <span class="tg">✈️ Telegram</span>
@@ -668,11 +667,10 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
         <div class="icon">✈️</div>
         <div class="msg">
           <strong>RemindClient Bot</strong>
-          Hi Mdm Rohana, gentle reminder that Ahmad's tuition fee of SGD 240 is due. PayNow to 9123 4567. Thank you! 🙏
+          Hi Ahmad! Just a friendly reminder that your payment of S$240 is due. You can PayNow to 9123 4567. Thank you! 🙏
           <div class="notif-buttons">
-            <span class="yes">✅ I've Paid</span>
-            <span class="receipt">📸 Receipt</span>
-            <span class="later">⏰ Later</span>
+            <span class="yes">📸 Submit payment screenshot</span>
+            <span class="later">⏰ Remind later</span>
           </div>
         </div>
       </div>
@@ -689,7 +687,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
     <div class="feature-visual" style="background:#E6F5ED;border-color:#C2E5D0">
       <div class="feature-mockup" style="background:#F5F5F5;padding:16px;border-radius:12px">
         <div style="background:#E6F5ED;padding:10px 14px;border-radius:8px;border-bottom-right-radius:2px;font-size:0.85rem;color:#303030;max-width:280px;margin-left:auto;line-height:1.5">
-          Hi Mdm Rohana, Ahmad's fee of SGD 240 (Sep + Oct) is due. PayNow to 9123 4567. Thank you! 🙏
+          Hi Ahmad! Your S$240 for Sep + Oct is due. PayNow to 9123 4567. Thank you! 🙏
           <div style="text-align:right;font-size:0.7rem;color:#8D9FA5;margin-top:4px">10:02 AM ✓✓</div>
         </div>
       </div>
