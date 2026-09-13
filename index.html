@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RemindClient — AI-Powered Reminders for Service Providers</title>
-<meta name="description" content="AI-powered payment and appointment reminder app for tutors, coaches, freelancers, and landlords. Telegram & WhatsApp. Start free for 1 month.">
+<meta name="description" content="AI-powered payment and appointment reminder app for tutors, coaches, freelancers, and landlords. Telegram & WhatsApp. Plans from S$10/month.">
 <meta property="og:title" content="RemindClient by ShiftedTech">
 <meta property="og:description" content="Never chase a payment again. AI-crafted reminders for service providers.">
 <meta property="og:type" content="website">
@@ -46,7 +46,7 @@ a{color:var(--blue-500);text-decoration:none}
 /* HERO */
 .hero{padding:140px 24px 100px;text-align:center;background:white}
 .hero-inner{max-width:720px;margin:0 auto}
-.hero h1{font-size:clamp(2.4rem,5vw,3.6rem);font-weight:800;line-height:1.1;letter-spacing:-0.03em;color:var(--black);margin-bottom:20px}
+.hero h1{font-size:clamp(2.4rem,5vw,3.6rem);font-weight:800;line-height:1.1;letter-spacing:-0.03em;color:var(--black);margin-bottom:20px;text-align:center}
 .hero p{font-size:clamp(1.05rem,2vw,1.25rem);color:var(--grey-500);line-height:1.7;margin-bottom:36px;max-width:580px;margin-left:auto;margin-right:auto}
 .hero-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .btn-primary{background:var(--green);color:white;padding:14px 28px;border-radius:8px;font-weight:600;font-size:1rem;border:none;cursor:pointer;transition:background 0.2s,transform 0.1s}
@@ -128,13 +128,13 @@ section{padding:80px 24px}
 
 /* PRICING */
 .pricing-section{background:var(--light-grey)}
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start}
-.pricing-card{background:white;border:1px solid var(--grey-200);border-radius:16px;padding:36px 28px;position:relative;transition:box-shadow 0.2s}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:stretch}
+.pricing-card{background:white;border:1px solid var(--grey-200);border-radius:16px;padding:36px 28px;position:relative;transition:box-shadow 0.2s;display:flex;flex-direction:column}
 .pricing-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.06)}
-.pricing-card.featured{border-color:var(--green);box-shadow:0 4px 24px rgba(0,122,61,0.12);border-width:2px}
+.pricing-card.featured{border-color:var(--green);box-shadow:0 4px 24px rgba(0,122,61,0.12);border-width:2px;padding:35px 27px}
 .pricing-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--green);color:white;padding:4px 16px;border-radius:20px;font-size:0.75rem;font-weight:700}
 .pricing-card h3{font-size:1.15rem;font-weight:700;margin-bottom:4px}
-.pricing-card .desc{color:var(--grey-500);font-size:0.88rem;margin-bottom:20px}
+.pricing-card .desc{color:var(--grey-500);font-size:0.88rem;margin-bottom:20px;min-height:3.2em}
 .pricing-price{margin-bottom:24px}
 .pricing-price .amount{font-size:2.8rem;font-weight:800;letter-spacing:-0.03em;color:var(--black)}
 .pricing-price .period{color:var(--grey-500);font-size:0.9rem}
@@ -142,8 +142,8 @@ section{padding:80px 24px}
 .pricing-features{list-style:none;padding:0;margin-bottom:28px}
 .pricing-features li{padding:8px 0;font-size:0.9rem;color:var(--grey-600);display:flex;gap:10px;align-items:flex-start;line-height:1.5}
 .pricing-features li::before{content:"✓";color:var(--green);font-weight:700;flex-shrink:0}
-.pricing-btn{display:block;width:100%;padding:14px;border-radius:8px;text-align:center;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;transition:all 0.2s}
-.pricing-btn.primary{background:var(--green);color:white}
+.pricing-btn{display:block;width:100%;margin-top:auto;padding:14px;border-radius:8px;text-align:center;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;transition:all 0.2s}
+.pricing-btn.primary{background:var(--green);color:white;border:2px solid transparent}
 .pricing-btn.primary:hover{background:var(--green-dark)}
 .pricing-btn.outline{background:white;color:var(--red);border:2px solid var(--red)}
 .pricing-btn.outline:hover{background:var(--red-light);color:var(--red-dark)}
@@ -221,8 +221,8 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 
 
 /* ROTATING HEADLINE */
-.rotating-word-wrap{display:inline-block;position:relative;overflow:hidden;height:1.5em;width:100%;text-align:center}
-.rotating-word{display:inline-block;color:var(--green);position:absolute;left:50%;bottom:0;transform:translateX(-50%);white-space:nowrap;animation:none;transition:transform 0.4s ease,opacity 0.4s ease}
+.rotating-word-wrap{display:block;overflow:hidden;height:1.25em;line-height:1.25em;text-align:center}
+.rotating-word{display:inline-block;color:var(--green);white-space:nowrap;transition:transform 0.4s ease,opacity 0.4s ease}
 .rotating-word.slide-out{transform:translateY(-110%);opacity:0}
 .rotating-word.slide-in{transform:translateY(110%);opacity:0}
 
@@ -331,13 +331,13 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 <!-- HERO -->
 <section class="hero">
 <div class="hero-inner">
-  <h1>Never chase<br><span class="rotating-word-wrap"><span id="rotating-word" class="rotating-word">payment</span></span><br>again.</h1>
+  <h1>Never chase<span class="rotating-word-wrap"><span id="rotating-word" class="rotating-word">payments</span></span>again.</h1>
   <p>RemindClient sends polite, AI-crafted payment and lesson reminders to your clients and students' parents — so you can focus on what you do and we do the reminders.</p>
   <div class="hero-buttons">
-    <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app/" class="btn-primary">Start free trial — 1 month free</a>
+    <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app/" class="btn-primary">Get started</a>
     <a href="#how" class="btn-secondary">See how it works</a>
   </div>
-  <p class="hero-note">No credit card required. Cancel anytime.</p>
+  <p class="hero-note">Plans from S$10/month. Cancel anytime.</p>
 </div>
 </section>
 
@@ -715,24 +715,6 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
     </div>
   </div>
 
-  <!-- Feature 6: Calendar subscription -->
-  <div class="feature reveal">
-    <div class="feature-text">
-      <h3>Calendar Subscription for Clients</h3>
-      <p>Clients subscribe once — one tap on iPhone, one tap on Android. Every session appears in their phone's native calendar automatically.</p>
-      <p>When you change a session time, their calendar updates automatically. No app to install. No account to create.</p>
-    </div>
-    <div class="feature-visual">
-      <div style="text-align:center">
-        <div style="font-size:3rem;margin-bottom:16px">📅</div>
-        <div style="font-size:0.95rem;color:var(--black);font-weight:600;margin-bottom:8px">One link. Every device.</div>
-        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-          <span style="padding:8px 16px;border-radius:8px;background:var(--black);color:white;font-size:0.82rem;font-weight:600">📱 iPhone — tap Subscribe</span>
-          <span style="padding:8px 16px;border-radius:8px;background:var(--green);color:white;font-size:0.82rem;font-weight:600">📱 Android — tap Add</span>
-        </div>
-      </div>
-    </div>
-  </div>
 
 </div>
 </section>
@@ -783,7 +765,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 <div class="section-inner centered">
   <p class="section-label" style="color:var(--red)">Pricing</p>
   <h2 class="section-title">Simple pricing. No surprises.</h2>
-  <p class="section-subtitle">Starter comes with a 1-month free trial. No credit card required.</p>
+  <p class="section-subtitle">Pay monthly or yearly. Switch plans or cancel anytime.</p>
   <div class="pricing-toggle">
     <span class="active" id="toggle-monthly">Monthly</span>
     <div class="toggle-switch" id="pricing-switch" onclick="togglePricing()">
@@ -801,16 +783,15 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
         <div class="price-annual" id="save-starter">Save S$20/year</div>
       </div>
       <ul class="pricing-features">
-        <li>Up to 15 clients</li>
+        <li>Up to 20 clients</li>
         <li>AI reminder drafting (20/day)</li>
         <li>2 auto-reminders per client</li>
         <li>Telegram auto-send</li>
         <li>WhatsApp one-tap send</li>
         <li>Visual calendar</li>
-        <li>Calendar subscription for clients</li>
         <li>Payment tracking</li>
       </ul>
-      <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app/" class="pricing-btn primary" style="display:block;text-decoration:none">Start free trial — 1 month free</a>
+      <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app/" class="pricing-btn primary" style="display:block;text-decoration:none">Get started</a>
     </div>
 
     <div class="pricing-card featured reveal reveal-delay-1 tilt-card">
@@ -872,7 +853,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Do my clients need to install an app?</div>
-      <div class="faq-a">No. Reminders arrive via Telegram or WhatsApp — apps they already use. Calendar subscriptions work with iPhone or Android's built-in calendar. Zero downloads, zero setup for them.</div>
+      <div class="faq-a">No. Reminders arrive via Telegram or WhatsApp — apps they already use. Zero downloads, zero setup for them.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I use this for something other than tutoring?</div>
@@ -883,8 +864,8 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
       <div class="faq-a">Yes. The AI drafts a suggestion, but you can edit it, rewrite it, or type your own from scratch. You can also ask the AI to change the tone: "make it more formal", "translate to Malay", "add my PayNow QR link".</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What happens after the free trial?</div>
-      <div class="faq-a">You pick a plan and pay via PayNow (bank transfer coming soon). If you don't pick a plan, your account simply stops sending reminders — your data stays safe and accessible for 30 days.</div>
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do I pay?</div>
+      <div class="faq-a">Pick a plan and pay via PayNow (bank transfer coming soon), monthly or yearly. If your plan lapses, your account simply stops sending reminders — your data stays safe and accessible for 30 days.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">I run an organisation, not a solo practice. Does this work for us?</div>
@@ -901,8 +882,8 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 <!-- FOOTER CTA -->
 <div class="footer-cta">
   <h2>You provide the service. We handle the reminders.</h2>
-  <p>Start your 1-month free trial — no card, no commitment, no awkward conversations.</p>
-  <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app/" class="btn-primary">Start Free Trial</a>
+  <p>Plans from S$10/month — no lock-in, no awkward conversations.</p>
+  <a href="https://personal-gemini-journal-359006588697.asia-southeast1.run.app/" class="btn-primary">Get Started</a>
   <p class="dm-note">Questions? DM us "REMIND" on Instagram <a href="https://instagram.com/careershifttechguy" style="color:var(--green)">@careershifttechguy</a></p>
 </div>
 
