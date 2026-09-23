@@ -66,7 +66,7 @@ section{padding:80px 24px}
 /* PROBLEM */
 .problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .problem-card{padding:32px;border-radius:12px;border:1px solid var(--grey-200);background:white}
-.problem-card .emoji{font-size:2rem;margin-bottom:16px}
+.problem-card .emoji{display:block;height:150px;width:auto;margin:0 auto 16px}
 .problem-card h3{font-size:1.15rem;font-weight:700;margin-bottom:8px;color:var(--black)}
 .problem-card p{color:var(--grey-500);font-size:0.95rem;line-height:1.65}
 .problem-bottom{text-align:center;margin-top:40px;font-size:1.1rem;color:var(--green-dim);font-weight:600;font-style:italic}
@@ -139,7 +139,7 @@ section{padding:80px 24px}
 .audience-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 .audience-card{padding:28px;border-radius:12px;border:1px solid var(--grey-200);background:white;transition:border-color 0.2s,box-shadow 0.2s}
 .audience-card:hover{border-color:var(--green);box-shadow:0 4px 16px rgba(0,122,61,0.1)}
-.audience-card .icon{font-size:1.8rem;margin-bottom:12px}
+.audience-card .icon{display:block;height:130px;width:auto;margin:0 auto 12px}
 .audience-card h3{font-size:1.05rem;font-weight:700;margin-bottom:6px}
 .audience-card p{color:var(--grey-500);font-size:0.9rem;line-height:1.6}
 
@@ -376,17 +376,17 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
   <h2 class="section-title">Sound familiar?</h2>
   <div class="problem-grid">
     <div class="problem-card reveal">
-      <div class="emoji">🤔</div>
+      <img class="emoji" src="images/think.webp" alt="Mascot thinking, hand on chin" width="195" height="480" loading="lazy">
       <h3>"Did they pay?"</h3>
       <p>You serve 15 clients. Some pay on time, some don't. You're not sure who owes what — and checking your bank statements at midnight isn't a system.</p>
     </div>
     <div class="problem-card reveal reveal-delay-1">
-      <div class="emoji">😅</div>
+      <img class="emoji" src="images/paiseh.webp" alt="Mascot laughing nervously" width="285" height="480" loading="lazy">
       <h3>"I feel paiseh to ask."</h3>
       <p>You delivered great service. But the payment is 2 months overdue and you'd rather absorb the loss than make it awkward.</p>
     </div>
     <div class="problem-card reveal reveal-delay-2">
-      <div class="emoji">😩</div>
+      <img class="emoji" src="images/shrug.webp" alt="Mascot shrugging, fed up" width="233" height="480" loading="lazy">
       <h3>"Another WhatsApp to type."</h3>
       <p>You draft the same reminder every month, personalise it for each client, copy-paste it 15 times. It takes an hour you don't bill for.</p>
     </div>
@@ -768,32 +768,32 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
   <p class="section-subtitle">If you provide a service and your clients need reminding — this is for you.</p>
   <div class="audience-grid">
     <div class="audience-card reveal">
-      <div class="icon">🎓</div>
+      <img class="icon" src="images/tutor.webp" alt="Mascot carrying a stack of books" width="268" height="480" loading="lazy">
       <h3>Tutors & Teachers</h3>
       <p>Private tutors, home tutors, music teachers — remind parents about fees and upcoming lessons automatically.</p>
     </div>
     <div class="audience-card reveal reveal-delay-1">
-      <div class="icon">🕌</div>
+      <img class="icon" src="images/asatizah.webp" alt="Mascot with Quran and prayer beads in front of a mosque" width="284" height="480" loading="lazy">
       <h3>Asatizah & Religious Teachers</h3>
       <p>Quran teachers, ustaz/ustazah — send polite reminders without the awkwardness. Teaching is ibadah; collecting shouldn't be a burden.</p>
     </div>
     <div class="audience-card reveal reveal-delay-2">
-      <div class="icon">💪</div>
+      <img class="icon" src="images/coach.webp" alt="Mascot with a barbell and stopwatch" width="352" height="480" loading="lazy">
       <h3>Coaches & Trainers</h3>
       <p>Fitness coaches, martial arts instructors, swimming coaches — your clients stay on track with session and payment reminders.</p>
     </div>
     <div class="audience-card reveal reveal-delay-0">
-      <div class="icon">🏠</div>
+      <img class="icon" src="images/landlord.webp" alt="Mascot holding cash in front of a house" width="331" height="480" loading="lazy">
       <h3>Landlords & Property Owners</h3>
       <p>Tenants who "forgot" to pay rent. Set a monthly reminder and the bot asks for you — every single month, on time.</p>
     </div>
     <div class="audience-card reveal reveal-delay-1">
-      <div class="icon">🏢</div>
+      <img class="icon" src="images/think.webp" alt="Mascot in a suit, thinking" width="195" height="480" loading="lazy">
       <h3>Freelancers & Service Providers</h3>
       <p>Designers, photographers, consultants — stop sending awkward "just following up" emails. Let the bot follow up for you.</p>
     </div>
     <div class="audience-card reveal reveal-delay-2">
-      <div class="icon">💼</div>
+      <img class="icon" src="images/shrug.webp" alt="Mascot with open hands" width="233" height="480" loading="lazy">
       <h3>Anyone Who Provides a Service</h3>
       <p>If someone owes you for a service you've delivered and you'd rather not be the one who asks — RemindClient asks for you.</p>
     </div>
