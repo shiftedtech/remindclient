@@ -949,9 +949,7 @@ footer .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:
 <script>
 
 // ===== LAND AT TOP ON PAGE LOAD =====
-window.addEventListener('load', () => {
-  window.scrollTo(0, 0);
-});
+// Scroll restoration
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }
@@ -988,14 +986,7 @@ const reveals = document.querySelectorAll('.reveal');
 const revealObs = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }});
 }, { threshold: 0.05 });
-reveals.forEach(el => {
-  const rect = el.getBoundingClientRect();
-  if (rect.top < window.innerHeight) {
-    el.classList.add('visible');
-  } else {
-    revealObs.observe(el);
-  }
-});
+reveals.forEach(el => revealObs.observe(el));
 
 // ===== PRICING TOGGLE =====
 let isAnnual = false;
